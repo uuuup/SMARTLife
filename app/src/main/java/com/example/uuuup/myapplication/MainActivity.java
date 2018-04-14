@@ -4,6 +4,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.graphics.BitmapFactory;
 import android.os.Bundle;
+import android.os.Handler;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -23,7 +24,6 @@ import com.amap.api.maps2d.CameraUpdateFactory;
 import com.amap.api.maps2d.LocationSource;
 import com.amap.api.maps2d.MapView;
 import com.amap.api.maps2d.UiSettings;
-import com.amap.api.maps2d.model.BitmapDescriptor;
 import com.amap.api.maps2d.model.BitmapDescriptorFactory;
 import com.amap.api.maps2d.model.LatLng;
 import com.amap.api.maps2d.model.Marker;
@@ -37,14 +37,21 @@ import com.example.uuuup.myapplication.entity.Constant;
 import com.example.uuuup.myapplication.utils.NavigationUtils;
 import com.example.uuuup.myapplication.utils.PhoneCallUtils;
 
+import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.io.PrintStream;
 import java.util.List;
 
 import static android.R.attr.description;
+import static android.R.attr.streamType;
 
-public class MainActivity extends BaseActivity implements LocationSource, AMapLocationListener, PoiSearch.OnPoiSearchListener, AMap.OnMarkerClickListener, AMap.OnMapClickListener, AMap.InfoWindowAdapter{
+public class MainActivity extends BaseActivity implements LocationSource, AMapLocationListener, PoiSearch.OnPoiSearchListener,
+        AMap.OnMarkerClickListener, AMap.OnMapClickListener, AMap.InfoWindowAdapter, AMap.OnInfoWindowClickListener, View.OnClickListener{
 
     private MapView mMapView;//地图容器
     private boolean isFirstLoc = true;//标识，用于判断是否只显示一次定位信息和用户重新定位
@@ -60,14 +67,30 @@ public class MainActivity extends BaseActivity implements LocationSource, AMapLo
 
     private OnLocationChangedListener mListener = null;//声明mListener对象，定位监听器
     private android.widget.TextView tvLocation;
-    private Marker oldMarker;
-    private LatLng myLatLng;
-    private AMap.InfoWindowAdapter adapter;
+    private Marker oldMarker;//点击的marker
+    private LatLng myLatLng;//我的位置
+    private TcpManager manager;
+
+    private Handler mHandler = new Handler(){
+        public void handleMessage(android.os.Message msg) {
+            switch (msg.what) {
+                case TcpManager.STATE_FROM_SERVER_OK:
+                    String result = (String) msg.obj;
+                    ToastUtil.show(MainActivity.this, result);
+                    break;
+
+                default:
+                    break;
+            }
+        };
+    };
+
 
     @Override
-    protected void onCreate(Bundle savedInstanceState) {
+    protected void onCreate(Bundle savedInstanceState)  {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
 
         Button forceOffline = (Button) findViewById(R.id.force_offline);
         forceOffline.setOnClickListener(new View.OnClickListener() {
@@ -77,6 +100,7 @@ public class MainActivity extends BaseActivity implements LocationSource, AMapLo
                 sendBroadcast(intent);
             }
         });
+
 
         this.tvLocation = (TextView) findViewById(R.id.tvLocation);
         //this.map = (MapView) findViewById(R.id.map);
@@ -109,11 +133,13 @@ public class MainActivity extends BaseActivity implements LocationSource, AMapLo
             aMap.getCameraPosition(); //方法可以获取地图的旋转角度
             settings.setCompassEnabled(true);
 
-            aMap.setOnMarkerClickListener(this);
-
             //每像素代表几米
             //float scale = aMap.getScalePerPixel();
         }
+        //开启连接
+        //manager = TcpManager.getInstance();
+        //manager.connect(mHandler);
+
         //开始定位
         location();
     }
@@ -137,6 +163,7 @@ public class MainActivity extends BaseActivity implements LocationSource, AMapLo
 
     @Override
     protected void onDestroy() {
+        //manager.disConnect();//结束连接
         super.onDestroy();
         //在activity执行onDestroy时执行mMapView.onDestroy()，实现地图生命周期管理
         mMapView.onDestroy();
@@ -145,7 +172,7 @@ public class MainActivity extends BaseActivity implements LocationSource, AMapLo
     }
 
     @Override
-    protected void onResume() {
+    protected void onResume()  {
         super.onResume();
         //在activity执行onResume时执行mMapView.onResume ()，实现地图生命周期管理
         mMapView.onResume();
@@ -260,10 +287,18 @@ public class MainActivity extends BaseActivity implements LocationSource, AMapLo
             String title = poi.getTitle();
             //获取内容
             String snippet = poi.getSnippet();
+
             LatLng latLng = new LatLng( latOfPoi, lonOfPoi);
 
-            final Marker marker = aMap.addMarker(new MarkerOptions().anchor(0.5f, 0.5f).position(latLng).title(title).snippet(snippet).icon(BitmapDescriptorFactory.fromResource(R.drawable.marker_normal)));
+            MarkerOptions markerOptions = new MarkerOptions().anchor(0.5f, 0.5f)
+                    .position(latLng)
+                    .title(title)
+                    .snippet(snippet)
+                    .icon(BitmapDescriptorFactory.fromResource(R.drawable.marker_normal));
+            aMap.addMarker(markerOptions);
             aMap.setOnMarkerClickListener(this);
+            aMap.setInfoWindowAdapter(this);//AMap类中
+            aMap.setOnInfoWindowClickListener(this);
 
             System.out.println(lon+"~~~"+lat+"~~~"+title+"~~~"+snippet);
         }
@@ -274,7 +309,7 @@ public class MainActivity extends BaseActivity implements LocationSource, AMapLo
     public void onPoiItemSearched(PoiItem poiItem, int i) {
     }
 
-    //maker的点击事件
+
     //地图的点击事件
     @Override
     public void onMapClick(LatLng latLng) {
@@ -292,39 +327,46 @@ public class MainActivity extends BaseActivity implements LocationSource, AMapLo
             if (oldMarker != null) {
                 oldMarker.setIcon(BitmapDescriptorFactory.fromResource(R.drawable.marker_normal));
             }
-            oldMarker = marker;
             marker.setIcon(BitmapDescriptorFactory.fromResource(R.drawable.marker_selected));
         }
+        oldMarker = marker;
         marker.showInfoWindow();
         return false; //返回 “false”，除定义的操作之外，默认操作也将会被执行
     }
 
+
+
+    //从这里开始是自定义显示InfoWindow
     @Override
     public View getInfoWindow(Marker marker) {
-        aMap.setInfoWindowAdapter(adapter);
-        Context mContext = BaseApplication.getIntance().getBaseContext();
         LatLng latLng;
-        LinearLayout call;
+        LinearLayout more;
         LinearLayout navigation;
         TextView nameTV;
         String Name;
         TextView addrTV;
         String snippet;
+
         latLng = marker.getPosition();
-        snippet = marker.getSnippet();
         Name = marker.getTitle();
         snippet = marker.getSnippet();
+        String[] list = snippet.split(";");//提取出每个站点
+//        try {
+//            list[0] = manager.sendMessage(list[0]);
+//        } catch (IOException e) {
+//            e.printStackTrace();
+//        }
 
-        View view = LayoutInflater.from(mContext).inflate(R.layout.view_infowindow, null);
+        View view = getLayoutInflater().inflate(R.layout.view_infowindow, null);//view_infowindow为自定义layout文件
         navigation = (LinearLayout) view.findViewById(R.id.navigation_LL);
-        call = (LinearLayout) view.findViewById(R.id.call_LL);
+        more = (LinearLayout) view.findViewById(R.id.call_LL);
         nameTV = (TextView) view.findViewById(R.id.agent_name);
         addrTV = (TextView) view.findViewById(R.id.agent_addr);
 
         nameTV.setText(Name);
-        addrTV.setText(snippet);
-        //navigation.setOnClickListener(this);
-        //call.setOnClickListener(this);
+        addrTV.setText(list[0]);//首页只显示第一个站点
+        navigation.setOnClickListener(this);
+        more.setOnClickListener(this);
         return view;
     }
 
@@ -332,4 +374,30 @@ public class MainActivity extends BaseActivity implements LocationSource, AMapLo
     public View getInfoContents(Marker marker) {
         return null;
     }
+
+    //InfoWindow的点击事件
+    @Override
+    public void onInfoWindowClick(Marker marker) {
+    }
+
+    //自定义InfoWindow中有两个按钮，这是它们的点击事件
+    @Override
+    public void onClick(View v) {
+        int id = v.getId();
+        switch (id){
+            case R.id.navigation_LL:  //点击导航
+                NavigationUtils.Navigation(new LatLng(39.9088691069, 116.3973823161));
+                break;
+
+            case R.id.call_LL:  //出现更多
+                Intent intent = new Intent(MainActivity.this, MoreInformation.class);
+
+                intent.putExtra("more_information", oldMarker.getSnippet());
+                startActivity(intent);
+                //finish();如果执行finish()方法,那么按下back键时则不会回退到上一个界面
+                //PhoneCallUtils.call("028-"); //TODO 处理电话号码
+                break;
+        }
+    }
+
 }

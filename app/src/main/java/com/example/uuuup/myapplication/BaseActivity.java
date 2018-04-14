@@ -12,6 +12,9 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
+
+import java.io.IOException;
+
 /**
  * Created by uuuup on 2018/3/4.
  */
@@ -27,7 +30,7 @@ public class BaseActivity extends AppCompatActivity {
     }
 
     @Override
-    protected void onResume() {
+    protected void onResume()  {
         super.onResume();
         IntentFilter intentFilter = new IntentFilter();
         intentFilter.addAction("com.example.broadcastbestpractice.FORCE_OFFLINE");
