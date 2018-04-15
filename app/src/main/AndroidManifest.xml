@@ -12,7 +12,8 @@
     <uses-permission android:name="android.permission.ACCESS_WIFI_STATE" />
     <!-- 允许程序读写手机状态和身份 -->
     <uses-permission android:name="android.permission.READ_PHONE_STATE" />
-
+    <!-- 允许访问互联网数据-->
+    <uses-permission  android:name="android.permission.INTERNET"/>
     <!-- 用于进行网络定位 -->
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
     <uses-permission android:name="android.permission.ACCESS_LOCATION_EXTRA_COMMANDS" />
@@ -40,7 +41,11 @@
         <service android:name="com.amap.api.location.APSService" />
 
         <activity android:name=".MainActivity" />
-        <activity android:name=".MoreInformation"></activity>
+        <activity android:name=".MoreInformation"></activity><!-- ATTENTION: This was auto-generated to add Google Play services to your project for
+     App Indexing.  See https://g.co/AppIndexing/AndroidStudio for more information. -->
+        <meta-data
+            android:name="com.google.android.gms.version"
+            android:value="@integer/google_play_services_version" />
     </application>
 
 </manifest>

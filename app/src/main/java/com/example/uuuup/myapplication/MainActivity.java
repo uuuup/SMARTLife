@@ -1,15 +1,19 @@
 package com.example.uuuup.myapplication;
 
+import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.BitmapFactory;
+import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
+import android.os.Message;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.Button;
 import android.widget.LinearLayout;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -18,8 +22,8 @@ import com.amap.api.location.AMapLocationClient;
 import com.amap.api.location.AMapLocationClientOption;
 import com.amap.api.location.AMapLocationListener;
 import com.amap.api.maps2d.AMap;
+import com.amap.api.maps2d.AMapException;
 import com.amap.api.maps2d.AMapOptions;
-import com.amap.api.maps2d.AMapUtils;
 import com.amap.api.maps2d.CameraUpdateFactory;
 import com.amap.api.maps2d.LocationSource;
 import com.amap.api.maps2d.MapView;
@@ -28,30 +32,26 @@ import com.amap.api.maps2d.model.BitmapDescriptorFactory;
 import com.amap.api.maps2d.model.LatLng;
 import com.amap.api.maps2d.model.Marker;
 import com.amap.api.maps2d.model.MarkerOptions;
+
+import com.amap.api.maps2d.overlay.WalkRouteOverlay;
 import com.amap.api.services.core.LatLonPoint;
 import com.amap.api.services.core.PoiItem;
 import com.amap.api.services.poisearch.PoiResult;
 import com.amap.api.services.poisearch.PoiSearch;
-import com.example.uuuup.myapplication.base.BaseApplication;
-import com.example.uuuup.myapplication.entity.Constant;
-import com.example.uuuup.myapplication.utils.NavigationUtils;
-import com.example.uuuup.myapplication.utils.PhoneCallUtils;
+import com.amap.api.services.route.BusRouteResult;
+import com.amap.api.services.route.DriveRouteResult;
+import com.amap.api.services.route.RouteSearch;
+import com.amap.api.services.route.WalkPath;
+import com.amap.api.services.route.WalkRouteResult;
 
-import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.io.PrintStream;
-import java.util.List;
 
-import static android.R.attr.description;
-import static android.R.attr.streamType;
 
 public class MainActivity extends BaseActivity implements LocationSource, AMapLocationListener, PoiSearch.OnPoiSearchListener,
-        AMap.OnMarkerClickListener, AMap.OnMapClickListener, AMap.InfoWindowAdapter, AMap.OnInfoWindowClickListener, View.OnClickListener{
+        AMap.OnMarkerClickListener, AMap.OnMapClickListener, AMap.InfoWindowAdapter, AMap.OnInfoWindowClickListener,
+        View.OnClickListener, RouteSearch.OnRouteSearchListener {
 
     private MapView mMapView;//地图容器
     private boolean isFirstLoc = true;//标识，用于判断是否只显示一次定位信息和用户重新定位
@@ -66,28 +66,19 @@ public class MainActivity extends BaseActivity implements LocationSource, AMapLo
     private float zoomlevel = 17f; //地图放大级别
 
     private OnLocationChangedListener mListener = null;//声明mListener对象，定位监听器
-    private android.widget.TextView tvLocation;
+    private TextView tvLocation;
     private Marker oldMarker;//点击的marker
     private LatLng myLatLng;//我的位置
-    private TcpManager manager;
 
-    private Handler mHandler = new Handler(){
-        public void handleMessage(android.os.Message msg) {
-            switch (msg.what) {
-                case TcpManager.STATE_FROM_SERVER_OK:
-                    String result = (String) msg.obj;
-                    ToastUtil.show(MainActivity.this, result);
-                    break;
-
-                default:
-                    break;
-            }
-        };
-    };
-
+    //显示路径
+    private RouteSearch mRouteSearch;
+    private WalkRouteResult mWalkRouteResult;
+    private RelativeLayout mBottomLayout, mHeadLayout;
+    private TextView mRotueTimeDes, mRouteDetailDes;
+    private ProgressDialog progDialog = null;// 搜索时进度条
 
     @Override
-    protected void onCreate(Bundle savedInstanceState)  {
+    protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
@@ -117,18 +108,16 @@ public class MainActivity extends BaseActivity implements LocationSource, AMapLo
         });
 
         if (aMap == null) {
-            aMap =  mMapView.getMap();
+            aMap = mMapView.getMap();
             aMap.setLocationSource(this);//设置了定位的监听,这里要实现LocationSource接口
             aMap.setMyLocationEnabled(true);//显示定位层并且可以触发定位,默认是flase
 
-            UiSettings settings =  aMap.getUiSettings();//设置显示定位按钮 并且可以点击
+            UiSettings settings = aMap.getUiSettings();//设置显示定位按钮 并且可以点击
             settings.setMyLocationButtonEnabled(false);// 是否显示定位按钮
 
             settings.setZoomControlsEnabled(true);//管理缩放控件
             settings.setLogoPosition(AMapOptions.LOGO_POSITION_BOTTOM_LEFT);//设置logo位置，左下，底部居中，右下
             settings.setScaleControlsEnabled(true);//设置显示地图的默认比例尺
-
-
             //添加指南针
             aMap.getCameraPosition(); //方法可以获取地图的旋转角度
             settings.setCompassEnabled(true);
@@ -136,10 +125,9 @@ public class MainActivity extends BaseActivity implements LocationSource, AMapLo
             //每像素代表几米
             //float scale = aMap.getScalePerPixel();
         }
-        //开启连接
-        //manager = TcpManager.getInstance();
-        //manager.connect(mHandler);
-
+        //初始化对象
+        mRouteSearch = new RouteSearch(this);
+        mRouteSearch.setRouteSearchListener(this);
         //开始定位
         location();
     }
@@ -163,7 +151,6 @@ public class MainActivity extends BaseActivity implements LocationSource, AMapLo
 
     @Override
     protected void onDestroy() {
-        //manager.disConnect();//结束连接
         super.onDestroy();
         //在activity执行onDestroy时执行mMapView.onDestroy()，实现地图生命周期管理
         mMapView.onDestroy();
@@ -172,7 +159,7 @@ public class MainActivity extends BaseActivity implements LocationSource, AMapLo
     }
 
     @Override
-    protected void onResume()  {
+    protected void onResume() {
         super.onResume();
         //在activity执行onResume时执行mMapView.onResume ()，实现地图生命周期管理
         mMapView.onResume();
@@ -214,14 +201,14 @@ public class MainActivity extends BaseActivity implements LocationSource, AMapLo
                 aMapLocation.getCityCode();//城市编码
                 aMapLocation.getAdCode();//地区编码
                 aMapLocation.getAoiName();//获取当前定位点的AOI信息
-                myLatLng = new LatLng( lat, lon);
+                myLatLng = new LatLng(lat, lon);
 
                 //获取定位时间
                 SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
                 Date date = new Date(aMapLocation.getTime());
                 df.format(date);//定位时间
 
-                poiSearch( lat, lon);//传入此时定位的经纬度，进行搜索公交站点
+                poiSearch(lat, lon);//传入此时定位的经纬度，进行搜索公交站点
 
                 // 如果不设置标志位，此时再拖动地图时，它会不断将地图移动到当前的位置
                 if (isFirstLoc) {
@@ -241,9 +228,9 @@ public class MainActivity extends BaseActivity implements LocationSource, AMapLo
                     isFirstLoc = false;
                 }
 
-            }else {
+            } else {
                 //定位失败时，可通过ErrCode（错误码）信息来确定失败的原因，errInfo是错误信息，详见错误码表。
-                Log.e("地图错误","定位失败, 错误码:" + aMapLocation.getErrorCode() + ", 错误信息:"
+                Log.e("地图错误", "定位失败, 错误码:" + aMapLocation.getErrorCode() + ", 错误信息:"
                         + aMapLocation.getErrorInfo());
             }
         }
@@ -259,22 +246,23 @@ public class MainActivity extends BaseActivity implements LocationSource, AMapLo
         mListener = null;
     }
 
-    private void startLocation(){
-        if(mLocationClient != null){
-            aMap.moveCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(lat,lon),zoomlevel));//17f代表地图放大的级别
+    private void startLocation() {
+        if (mLocationClient != null) {
+            aMap.moveCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(lat, lon), zoomlevel));//17f代表地图放大的级别
         }
     }
 
 
-    public void poiSearch( double lat, double lon){
-        PoiSearch.Query query = new PoiSearch.Query( "公交站点", "" , "");//"150702"为公交站点的poi
+    public void poiSearch(double lat, double lon) {
+        PoiSearch.Query query = new PoiSearch.Query("公交站点", "", "");//"150702"为公交站点的poi
         query.setPageSize(20);
         PoiSearch search = new PoiSearch(this, query);
-        search.setBound(new PoiSearch.SearchBound(new LatLonPoint( 45.7784237183, 126.6177728296), 10000));//哈尔滨的经纬度是45.7784237183, 126.6177728296
+        search.setBound(new PoiSearch.SearchBound(new LatLonPoint(lat, lon), 10000));//哈尔滨的经纬度是45.7784237183, 126.6177728296
         search.setOnPoiSearchListener(this);
         search.searchPOIAsyn();
         //query设置的范围“哈尔滨”需要跟setBound的范围一致, query的第三个参数不设置也可以, 跟设置成“哈尔滨”一致
     }
+
     @Override
     public void onPoiSearched(PoiResult poiResult, int i) {
         ArrayList<PoiItem> pois = poiResult.getPois();
@@ -288,7 +276,7 @@ public class MainActivity extends BaseActivity implements LocationSource, AMapLo
             //获取内容
             String snippet = poi.getSnippet();
 
-            LatLng latLng = new LatLng( latOfPoi, lonOfPoi);
+            LatLng latLng = new LatLng(latOfPoi, lonOfPoi);
 
             MarkerOptions markerOptions = new MarkerOptions().anchor(0.5f, 0.5f)
                     .position(latLng)
@@ -300,7 +288,7 @@ public class MainActivity extends BaseActivity implements LocationSource, AMapLo
             aMap.setInfoWindowAdapter(this);//AMap类中
             aMap.setOnInfoWindowClickListener(this);
 
-            System.out.println(lon+"~~~"+lat+"~~~"+title+"~~~"+snippet);
+            System.out.println(lon + "~~~" + lat + "~~~" + title + "~~~" + snippet);
         }
         System.out.println("直接打印这个信息，代表没有搜索到信息");
     }
@@ -323,7 +311,7 @@ public class MainActivity extends BaseActivity implements LocationSource, AMapLo
     //maker的点击事件
     @Override
     public boolean onMarkerClick(Marker marker) {
-        if (!marker.getPosition().equals(myLatLng)){ //点击的marker不是自己位置的那个marker
+        if (!marker.getPosition().equals(myLatLng)) { //点击的marker不是自己位置的那个marker
             if (oldMarker != null) {
                 oldMarker.setIcon(BitmapDescriptorFactory.fromResource(R.drawable.marker_normal));
             }
@@ -333,7 +321,6 @@ public class MainActivity extends BaseActivity implements LocationSource, AMapLo
         marker.showInfoWindow();
         return false; //返回 “false”，除定义的操作之外，默认操作也将会被执行
     }
-
 
 
     //从这里开始是自定义显示InfoWindow
@@ -350,12 +337,7 @@ public class MainActivity extends BaseActivity implements LocationSource, AMapLo
         latLng = marker.getPosition();
         Name = marker.getTitle();
         snippet = marker.getSnippet();
-        String[] list = snippet.split(";");//提取出每个站点
-//        try {
-//            list[0] = manager.sendMessage(list[0]);
-//        } catch (IOException e) {
-//            e.printStackTrace();
-//        }
+        final String[] list = snippet.split(";");//提取出每个站点
 
         View view = getLayoutInflater().inflate(R.layout.view_infowindow, null);//view_infowindow为自定义layout文件
         navigation = (LinearLayout) view.findViewById(R.id.navigation_LL);
@@ -384,9 +366,13 @@ public class MainActivity extends BaseActivity implements LocationSource, AMapLo
     @Override
     public void onClick(View v) {
         int id = v.getId();
-        switch (id){
+        switch (id) {
             case R.id.navigation_LL:  //点击导航
-                NavigationUtils.Navigation(new LatLng(39.9088691069, 116.3973823161));
+                LatLng latLng = oldMarker.getPosition();
+                RouteSearch.FromAndTo fromAndTo = new RouteSearch.FromAndTo(new LatLonPoint( lat, lon),
+                        new LatLonPoint(latLng.latitude, latLng.longitude));
+                RouteSearch.WalkRouteQuery query = new RouteSearch.WalkRouteQuery(fromAndTo, 3);//1代表步行，0是驾车，2是骑行
+                mRouteSearch.calculateWalkRouteAsyn(query);//开始算路
                 break;
 
             case R.id.call_LL:  //出现更多
@@ -400,4 +386,66 @@ public class MainActivity extends BaseActivity implements LocationSource, AMapLo
         }
     }
 
+    @Override
+    public void onBusRouteSearched(BusRouteResult busRouteResult, int i) {
+
+    }
+
+    @Override
+    public void onDriveRouteSearched(DriveRouteResult driveRouteResult, int i) {
+
+    }
+
+
+    /**
+     * 显示进度框
+     */
+    private void showProgressDialog() {
+        if (progDialog == null)
+            progDialog = new ProgressDialog(this);
+        progDialog.setProgressStyle(ProgressDialog.STYLE_SPINNER);
+        progDialog.setIndeterminate(false);
+        progDialog.setCancelable(true);
+        progDialog.setMessage("正在搜索");
+        progDialog.show();
+    }
+
+    /**
+     * 隐藏进度框
+     */
+    private void dissmissProgressDialog() {
+        if (progDialog != null) {
+            progDialog.dismiss();
+        }
+    }
+
+
+    @Override
+    public void onWalkRouteSearched(WalkRouteResult result, int i) {
+        dissmissProgressDialog();
+        aMap.clear();// 清理地图上的所有覆盖物
+        if (i == 1000) {
+            if (result != null && result.getPaths() != null) {
+                if (result.getPaths().size() > 0) {
+                    mWalkRouteResult = result;
+                    final WalkPath walkPath = mWalkRouteResult.getPaths()
+                            .get(0);
+                    WalkRouteOverlay walkRouteOverlay = new WalkRouteOverlay(
+                            this, aMap, walkPath,
+                            mWalkRouteResult.getStartPos(),
+                            mWalkRouteResult.getTargetPos());
+                    walkRouteOverlay.removeFromMap();
+                    walkRouteOverlay.addToMap();
+                    walkRouteOverlay.zoomToSpan();
+                    mBottomLayout.setVisibility(View.VISIBLE);
+                } else if (result != null && result.getPaths() == null) {
+                    Toast.makeText(MainActivity.this, "no result", Toast.LENGTH_SHORT).show();
+                }
+            } else {
+                Toast.makeText(MainActivity.this, "no result", Toast.LENGTH_SHORT).show();
+            }
+        } else {
+            ToastUtil.showerror(this.getApplicationContext(), i);
+        }
+    }
 }
