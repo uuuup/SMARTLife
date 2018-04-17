@@ -1,0 +1,38 @@
+{
+    "Version": 1,
+    "Created": "2018-02-02T09:46:25.362419514-05:00",
+    "Expires": "2019-02-02T09:46:25.362419514-05:00",
+    "PrevConfigHash": "1q0jr0gcvgcvxwx3mn6zbfgfm4d8cts99rxdbm37e9bpmpwk47bg",
+    "Service": "Convo",
+    "Inner": {
+      "Version": 1,
+      "Coordinator": {
+        "Key": "swtkvv9nakczp2nv8d8znw0rcwz9wp2eqrq4gt90czrbb6rrrshg",
+        "Address": "101.200.37.186:8000"
+      },
+      "MixServers": [
+        {
+          "Key": "afwyc9982t9fz812kr5qf5eedfbhre7p35vck6qasj3g3p4f5pp0",
+          "Address": "101.200.37.186:2718"
+        },
+        {
+          "Key": "nr6a97j23mjdtkhm3ftvm3acyhk7nc7gnp2zjvd0mrdw5y14qq1g",
+          "Address": "101.200.37.186:2719"
+        },
+        {
+          "Key": "1ctz2kejevk1395hnw3141r74qr58yz56kvbnwhhp2msxhhz1tb0",
+          "Address": "101.200.37.186:2720"
+        }
+      ]
+    },
+    "Guardians": [
+      {
+        "Username": "dojiao",
+        "Key": "eh1tgnf7bwcmyvytddg5gpvprdqm51eam1h80wf30d7yk80edmeg"
+      }
+    ],
+    "Signatures": {
+     "eh1tgnf7bwcmyvytddg5gpvprdqm51eam1h80wf30d7yk80edmeg": "tthkav8ah3mg5k73frz2gqar0v6j3tffnzcs8vv2bkhcp13xvhcjc6baeq8ce0s04a1wzhbtfzncrpsns8e7yre25k2hac50p7ctr2r" 
+    }
+  }
+  
