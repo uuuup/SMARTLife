@@ -44,6 +44,13 @@ import com.amap.api.services.route.RouteSearch;
 import com.amap.api.services.route.WalkPath;
 import com.amap.api.services.route.WalkRouteResult;
 
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.io.PrintStream;
+import java.net.Socket;
+import java.net.SocketTimeoutException;
+import java.net.UnknownHostException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
@@ -55,6 +62,7 @@ public class MainActivity extends BaseActivity implements LocationSource, AMapLo
 
     private MapView mMapView;//地图容器
     private boolean isFirstLoc = true;//标识，用于判断是否只显示一次定位信息和用户重新定位
+    private Handler handler ;
 
     public AMapLocationClient mLocationClient = null;//声明AMapLocationClient类对象
     public AMapLocationClientOption mLocationOption = null;//声明AMapLocationClientOption对象，实际是关于定位的参数
@@ -69,6 +77,7 @@ public class MainActivity extends BaseActivity implements LocationSource, AMapLo
     private TextView tvLocation;
     private Marker oldMarker;//点击的marker
     private LatLng myLatLng;//我的位置
+    private String tmpStr;
 
     //显示路径
     private RouteSearch mRouteSearch;
@@ -128,6 +137,7 @@ public class MainActivity extends BaseActivity implements LocationSource, AMapLo
         //初始化对象
         mRouteSearch = new RouteSearch(this);
         mRouteSearch.setRouteSearchListener(this);
+
         //开始定位
         location();
     }
@@ -257,7 +267,7 @@ public class MainActivity extends BaseActivity implements LocationSource, AMapLo
         PoiSearch.Query query = new PoiSearch.Query("公交站点", "", "");//"150702"为公交站点的poi
         query.setPageSize(20);
         PoiSearch search = new PoiSearch(this, query);
-        search.setBound(new PoiSearch.SearchBound(new LatLonPoint(lat, lon), 10000));//哈尔滨的经纬度是45.7784237183, 126.6177728296
+        search.setBound(new PoiSearch.SearchBound(new LatLonPoint(45.7784237183, 126.6177728296), 10000));//哈尔滨的经纬度是45.7784237183, 126.6177728296
         search.setOnPoiSearchListener(this);
         search.searchPOIAsyn();
         //query设置的范围“哈尔滨”需要跟setBound的范围一致, query的第三个参数不设置也可以, 跟设置成“哈尔滨”一致
@@ -275,9 +285,14 @@ public class MainActivity extends BaseActivity implements LocationSource, AMapLo
             String title = poi.getTitle();
             //获取内容
             String snippet = poi.getSnippet();
+            //System.out.println(lon + "~~~" + lat + "~~~" + title + "~~~" + snippet);
+
+            TcpManager socketThread = new TcpManager(snippet);
+            socketThread.start();
+            String str = socketThread.getData();
+            System.out.print("socket has connect " + str );
 
             LatLng latLng = new LatLng(latOfPoi, lonOfPoi);
-
             MarkerOptions markerOptions = new MarkerOptions().anchor(0.5f, 0.5f)
                     .position(latLng)
                     .title(title)
@@ -287,10 +302,9 @@ public class MainActivity extends BaseActivity implements LocationSource, AMapLo
             aMap.setOnMarkerClickListener(this);
             aMap.setInfoWindowAdapter(this);//AMap类中
             aMap.setOnInfoWindowClickListener(this);
-
-            System.out.println(lon + "~~~" + lat + "~~~" + title + "~~~" + snippet);
         }
-        System.out.println("直接打印这个信息，代表没有搜索到信息");
+
+        //System.out.println("直接打印这个信息，代表没有搜索到信息");
     }
 
     @Override
@@ -380,7 +394,6 @@ public class MainActivity extends BaseActivity implements LocationSource, AMapLo
 
                 intent.putExtra("more_information", oldMarker.getSnippet());
                 startActivity(intent);
-                //finish();如果执行finish()方法,那么按下back键时则不会回退到上一个界面
                 //PhoneCallUtils.call("028-"); //TODO 处理电话号码
                 break;
         }
