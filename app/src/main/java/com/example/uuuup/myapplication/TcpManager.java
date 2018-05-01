@@ -2,21 +2,26 @@ package com.example.uuuup.myapplication;
 
 import java.io.BufferedReader;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.io.OutputStream;
 import java.io.PrintStream;
 import java.net.Socket;
 import java.net.SocketTimeoutException;
 import java.net.UnknownHostException;
+import java.nio.Buffer;
 
 public class TcpManager extends Thread {
-    private String sendData;
+    private String[] sendData;
     private String receiveData;
     private Socket socket;
 
     public TcpManager(String string)
     {
         System.out.print("socket data: " + string);
-        this.sendData = string;
+        this.sendData = new String[2];
+        this.sendData[0] = string;
+        this.sendData[1] = "bye";
     }
 
     public String getData(){
@@ -34,20 +39,33 @@ public class TcpManager extends Thread {
 
             //获取输入流
             BufferedReader buf =  new BufferedReader(new InputStreamReader(socket.getInputStream()));
+            //InputStream buf_input = socket.getInputStream();
 
             // 获得输出流
             PrintStream out = new PrintStream(socket.getOutputStream());
-
-            out.print(this.sendData);
-            try {
-                this.receiveData = buf.readLine();
-                System.out.println("receive data"+ this.receiveData);
-
-            } catch (Exception e) {
-                e.printStackTrace();
-                System.out.println("Time out, No response");
+            //OutputStream out_output = socket.getOutputStream();
+            boolean flag = true;
+            while(flag){
+                int count = 0;
+                String str = this.sendData[count++];
+                out.println(str);
+                if("bye".equals(str)){
+                    flag = false;
+                }
+                else{
+                    try{
+                        String echo = buf.readLine();
+                        //System.out.println(echo);
+                        this.receiveData = echo;
+                    }catch(SocketTimeoutException e){
+                        System.out.println("Time out, No response");
+                    }
+                }
             }
-            buf.close();
+            //input.close();
+            if(socket != null){
+                socket.close(); //
+            }
         } catch (UnknownHostException e) {
             // TODO Auto-generated catch block
             e.printStackTrace();

@@ -267,7 +267,7 @@ public class MainActivity extends BaseActivity implements LocationSource, AMapLo
         PoiSearch.Query query = new PoiSearch.Query("公交站点", "", "");//"150702"为公交站点的poi
         query.setPageSize(20);
         PoiSearch search = new PoiSearch(this, query);
-        search.setBound(new PoiSearch.SearchBound(new LatLonPoint(45.7784237183, 126.6177728296), 10000));//哈尔滨的经纬度是45.7784237183, 126.6177728296
+        search.setBound(new PoiSearch.SearchBound(new LatLonPoint(lat, lon), 10000));//哈尔滨的经纬度是45.7784237183, 126.6177728296
         search.setOnPoiSearchListener(this);
         search.searchPOIAsyn();
         //query设置的范围“哈尔滨”需要跟setBound的范围一致, query的第三个参数不设置也可以, 跟设置成“哈尔滨”一致
