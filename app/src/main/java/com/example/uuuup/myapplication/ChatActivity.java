@@ -29,7 +29,6 @@ public class ChatActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        System.out.print("hello world!!!");
         setContentView(R.layout.activity_chat);
         initMsgs(); // 初始化消息数据
         inputText = (EditText) findViewById(R.id.input_text);
@@ -37,9 +36,6 @@ public class ChatActivity extends AppCompatActivity {
         msgRecyclerView = (RecyclerView) findViewById(R.id.msg_recycler_view);
         LinearLayoutManager layoutManager = new LinearLayoutManager(this);
         msgRecyclerView.setLayoutManager(layoutManager);
-        for (Msg msg : msgList){
-            System.out.print("tttttttt:"+msg.getContent());
-        }
         adapter = new MsgAdapter(msgList);
 
         msgRecyclerView.setAdapter(adapter);
@@ -65,9 +61,6 @@ public class ChatActivity extends AppCompatActivity {
         msgList.add(msg2);
         Msg msg3 = new Msg("This is Tom. Nice talking to you. ", Msg.TYPE_RECEIVED);
         msgList.add(msg3);
-        for (Msg msg : msgList){
-            System.out.print("111111111111111111:"+msg.getContent());
-        }
     }
 
 }

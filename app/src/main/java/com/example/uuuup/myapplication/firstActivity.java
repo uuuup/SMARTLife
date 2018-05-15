@@ -53,8 +53,8 @@ public class firstActivity extends BaseActivity implements BottomNavigationBar.O
 
     private void setDefaultFragment() {
         FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
-        mFragmentFour = FragmentFour.newInstance("one !");
-        transaction.replace(R.id.content, mFragmentFour).commit();
+        mFragmentOne = FragmentOne.newInstance();
+        transaction.replace(R.id.content, mFragmentOne);
     }
 
     @Override
@@ -62,16 +62,13 @@ public class firstActivity extends BaseActivity implements BottomNavigationBar.O
         FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
         switch (position) {
             case 0:
-                if (mFragmentOne == null) {
-                    mFragmentOne = FragmentOne.newInstance();
-                }
+                mFragmentOne = FragmentOne.newInstance();
                 transaction.replace(R.id.content, mFragmentOne);
                 break;
             case 1:
                 if (mFragmentTwo == null) {
                     mFragmentTwo = FragmentTwo.newInstance("two  Fragment");
                 }
-
                 transaction.replace(R.id.content, mFragmentTwo);
                 break;
             case 2:
@@ -81,10 +78,8 @@ public class firstActivity extends BaseActivity implements BottomNavigationBar.O
                 transaction.replace(R.id.content, mFragmentThree);
                 break;
             default:
-                if (mFragmentFour == null) {
-                    mFragmentFour = FragmentFour.newInstance("one !");
-                }
-                transaction.replace(R.id.content, mFragmentFour);
+                mFragmentOne = FragmentOne.newInstance();
+                transaction.replace(R.id.content, mFragmentOne);
                 break;
         }
         transaction.commit();

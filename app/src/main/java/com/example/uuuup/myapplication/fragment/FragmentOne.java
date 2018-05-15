@@ -1,6 +1,5 @@
 package com.example.uuuup.myapplication.fragment;
 
-
 import android.app.ProgressDialog;
 import android.content.Intent;
 import android.os.Bundle;
@@ -83,11 +82,21 @@ public class FragmentOne extends Fragment implements  LocationSource, AMapLocati
         return fragment;
     }
 
+    public FragmentOne() {
+
+    }
+
+    @Override
+    public void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+    }
+
+
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         // TODO Auto-generated method stub
         view = inflater.inflate(R.layout.fragment_one,container,false);
-
+        initview(savedInstanceState,view);
         return view;
     }
 
@@ -95,13 +104,12 @@ public class FragmentOne extends Fragment implements  LocationSource, AMapLocati
     public void onActivityCreated(Bundle savedInstanceState) {
         // TODO Auto-generated method stub
         super.onActivityCreated(savedInstanceState);
-        getActivity().setContentView(R.layout.fragment_one);
-        mMapView  = (MapView) view.findViewById(R.id.fragment_one_map);
-        mMapView.onCreate(savedInstanceState);
-        initmap();
+
     }
 
-    public void initmap(){
+    public void initview( Bundle savedInstanceState,View view){
+        mMapView  = (MapView) view.findViewById(R.id.fragment_one_map);
+        mMapView.onCreate(savedInstanceState);
         if (aMap == null) {
             aMap = mMapView.getMap();
             aMap.setLocationSource(this);//设置了定位的监听,这里要实现LocationSource接口
@@ -150,14 +158,15 @@ public class FragmentOne extends Fragment implements  LocationSource, AMapLocati
         mLocationClient.stopLocation();//停止定位
         mLocationClient.onDestroy();//销毁定位客户端
     }
-    @Override
-    public void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-    }
+
 
     @Override
     public void onDestroy() {
         super.onDestroy();
+        mMapView.onDestroy();
+        if(mLocationClient!=null){
+            mLocationClient.onDestroy();
+        }
     }
 
     @Override
@@ -260,6 +269,11 @@ public class FragmentOne extends Fragment implements  LocationSource, AMapLocati
     @Override
     public void deactivate() {
         mListener = null;
+        if(mLocationClient!=null){
+            mLocationClient.stopLocation();
+            mLocationClient.onDestroy();
+        }
+        mLocationClient=null;
     }
 
     private void startLocation() {
