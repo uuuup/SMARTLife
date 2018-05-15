@@ -12,6 +12,7 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.EditText;
+import android.widget.RadioButton;
 import android.widget.Toast;
 
 public class LoginActivity extends BaseActivity {
@@ -21,7 +22,6 @@ public class LoginActivity extends BaseActivity {
     private EditText accountEdit;
     private EditText passwordEdit;
     private Button login;
-
     private CheckBox rememberPass;
 
     @Override
@@ -62,8 +62,7 @@ public class LoginActivity extends BaseActivity {
                         editor.clear();
                     }
                     editor.apply();
-
-                    Intent intent = new Intent(LoginActivity.this, MainActivity.class);
+                    Intent intent = new Intent(LoginActivity.this, firstActivity.class);
                     startActivity(intent);
                     finish();
                 } else {

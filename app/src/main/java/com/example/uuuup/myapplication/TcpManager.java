@@ -33,9 +33,9 @@ public class TcpManager extends Thread {
         // 执行完毕后给handler发送一个空消息
         try {
             // 实例化Socket
-            socket = new Socket("211.159.187.82", 20005);
+            socket = new Socket("211.159.187.82", 20006);
             socket.setSoTimeout(10000);
-            System.out.print("new socket!!!!!!!!!");
+            //System.out.print("new socket!!!!!!!!!");
 
             //获取输入流
             BufferedReader buf =  new BufferedReader(new InputStreamReader(socket.getInputStream()));

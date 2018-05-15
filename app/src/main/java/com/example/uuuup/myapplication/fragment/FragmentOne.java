@@ -1,20 +1,20 @@
-package com.example.uuuup.myapplication;
+package com.example.uuuup.myapplication.fragment;
 
+
+import android.annotation.SuppressLint;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
-import android.graphics.BitmapFactory;
-import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
-import android.os.Message;
 import android.support.design.widget.NavigationView;
+import android.support.v4.app.Fragment;
 import android.support.v4.widget.DrawerLayout;
 import android.util.Log;
 import android.view.LayoutInflater;
-import android.view.MenuItem;
 import android.view.View;
-import android.widget.Button;
+import android.view.ViewGroup;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
@@ -35,26 +35,32 @@ import com.amap.api.maps2d.model.BitmapDescriptorFactory;
 import com.amap.api.maps2d.model.LatLng;
 import com.amap.api.maps2d.model.Marker;
 import com.amap.api.maps2d.model.MarkerOptions;
-
 import com.amap.api.maps2d.overlay.WalkRouteOverlay;
 import com.amap.api.services.core.LatLonPoint;
 import com.amap.api.services.core.PoiItem;
 import com.amap.api.services.poisearch.PoiResult;
 import com.amap.api.services.poisearch.PoiSearch;
+
 import com.amap.api.services.route.BusRouteResult;
 import com.amap.api.services.route.DriveRouteResult;
 import com.amap.api.services.route.RouteSearch;
+
 import com.amap.api.services.route.WalkPath;
 import com.amap.api.services.route.WalkRouteResult;
-import com.ashokvarma.bottomnavigation.BottomNavigationBar;
+import com.example.uuuup.myapplication.BaseFragment;
+import com.example.uuuup.myapplication.MainActivity;
+import com.example.uuuup.myapplication.MoreInformation;
+import com.example.uuuup.myapplication.R;
+import com.example.uuuup.myapplication.ToastUtil;
+
+
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 
-public class MainActivity extends BaseActivity implements LocationSource, AMapLocationListener, PoiSearch.OnPoiSearchListener,
+public class FragmentOne extends Fragment implements  LocationSource, AMapLocationListener, PoiSearch.OnPoiSearchListener,
         AMap.OnMarkerClickListener, AMap.OnMapClickListener, AMap.InfoWindowAdapter, AMap.OnInfoWindowClickListener,
         View.OnClickListener, RouteSearch.OnRouteSearchListener {
-
     private MapView mMapView;//地图容器
     private boolean isFirstLoc = true;//标识，用于判断是否只显示一次定位信息和用户重新定位
     private Handler handler ;
@@ -68,11 +74,9 @@ public class MainActivity extends BaseActivity implements LocationSource, AMapLo
     private AMap aMap;//地图类
     private float zoomlevel = 17f; //地图放大级别
 
-    private OnLocationChangedListener mListener = null;//声明mListener对象，定位监听器
-    private TextView tvLocation;
+    private LocationSource.OnLocationChangedListener mListener = null;//声明mListener对象，定位监听器
     private Marker oldMarker;//点击的marker
     private LatLng myLatLng;//我的位置
-    private String tmpStr;
 
     //显示路径
     private RouteSearch mRouteSearch;
@@ -81,82 +85,30 @@ public class MainActivity extends BaseActivity implements LocationSource, AMapLo
     private TextView mRotueTimeDes, mRouteDetailDes;
     private ProgressDialog progDialog = null;// 搜索时进度条
 
-    /** DrawerLayout */
-    private DrawerLayout drawerLayout;
-    //侧滑菜单栏
-    private NavigationView navigationView;
-    //标题栏-侧滑-按钮
-    ImageView menu;
-
-    private BottomNavigationBar mBottomNavigationBar;
+    public static FragmentOne newInstance(){
+        Bundle bundle = new Bundle();
+        FragmentOne fragment = new FragmentOne();
+        fragment.setArguments(bundle);
+        return fragment;
+    }
 
     @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main);
-        /*
-        //侧拉菜单
-        drawerLayout = (DrawerLayout) findViewById(R.id.activity_main);
-        navigationView = (NavigationView) findViewById(R.id.nav);
-        View headerView = navigationView.getHeaderView(0);
-        //开启手势滑动打开侧滑菜单栏，如果要关闭手势滑动，将后面的UNLOCKED替换成LOCKED_CLOSED 即可
-        drawerLayout.setDrawerLockMode(DrawerLayout.LOCK_MODE_UNLOCKED);
+    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+        // TODO Auto-generated method stub
+        View view = inflater.inflate(R.layout.fragment_one,container,false);
+        mMapView = (MapView) getView().findViewById(R.id.map);
+        initmap();
+        return view;
+    }
 
-        navigationView.setNavigationItemSelectedListener(new NavigationView.OnNavigationItemSelectedListener() {
-            @Override
-            public boolean onNavigationItemSelected( MenuItem item) {
-                switch (item.getItemId()){
-                    case R.id.menu_History:
-                        Toast.makeText(MainActivity.this,item.getTitle().toString(),Toast.LENGTH_SHORT).show();
-                        //Intent intent1 = new Intent();
-                        //intent1.setClass(MainActivity.this, activity_AboutUs.class);
-                        //startActivity(intent1);
-                        //此处不能加Finsh杀死界面否则点击返回会退出程序而不是回到主界面
-                        break;
-                    case R.id.menu_Setting:
-                        Toast.makeText(MainActivity.this,item.getTitle().toString(),Toast.LENGTH_SHORT).show();
-                        //Intent intent2 = new Intent();
-                        //intent2.setClass(MainActivity.this, activity_AboutUs.class);
-                        //startActivity(intent2);
-                        break;
-                    case R.id.menu_Feedback:
-                        Toast.makeText(MainActivity.this,item.getTitle().toString(),Toast.LENGTH_SHORT).show();
-                        break;
-                    case R.id.menu_AboutUs:
-                        Toast.makeText(MainActivity.this,item.getTitle().toString(),Toast.LENGTH_SHORT).show();
-                        break;
-                }
-                drawerLayout.closeDrawer(navigationView);
-                return true;
-            }
-        });*/
+    @Override
+    public void onActivityCreated(Bundle savedInstanceState) {
+        // TODO Auto-generated method stub
+        super.onActivityCreated(savedInstanceState);
+    }
 
 
-
-        //下限按钮
-        Button forceOffline = (Button) findViewById(R.id.force_offline);
-        forceOffline.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Intent intent = new Intent("com.example.broadcastbestpractice.FORCE_OFFLINE");
-                sendBroadcast(intent);
-            }
-        });
-
-        this.tvLocation = (TextView) findViewById(R.id.tvLocation);
-        //this.map = (MapView) findViewById(R.id.map);
-        // /获取地图控件引用
-        mMapView = (MapView) findViewById(R.id.map);
-        mMapView.onCreate(savedInstanceState);//在activity执行onCreate时执行mMapView.onCreate(savedInstanceState)，实现地图生命周期管理
-
-        //自定义的回到当前位置的事件
-        tvLocation.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                startLocation();
-            }
-        });
-
+    public void initmap(){
         if (aMap == null) {
             aMap = mMapView.getMap();
             aMap.setLocationSource(this);//设置了定位的监听,这里要实现LocationSource接口
@@ -176,15 +128,16 @@ public class MainActivity extends BaseActivity implements LocationSource, AMapLo
             //float scale = aMap.getScalePerPixel();
         }
         //初始化对象
-        mRouteSearch = new RouteSearch(this);
+        mRouteSearch = new RouteSearch(getContext());
         mRouteSearch.setRouteSearchListener(this);
 
         //开始定位
         location();
     }
 
+
     private void location() {
-        mLocationClient = new AMapLocationClient(getApplicationContext());//初始化定位
+        mLocationClient = new AMapLocationClient(getContext());//初始化定位
         mLocationClient.setLocationListener(this);//设置定位回调监听
 
         mLocationOption = new AMapLocationClientOption();//初始化定位参数
@@ -201,30 +154,48 @@ public class MainActivity extends BaseActivity implements LocationSource, AMapLo
     }
 
     @Override
-    protected void onDestroy() {
-        super.onDestroy();
-        //在activity执行onDestroy时执行mMapView.onDestroy()，实现地图生命周期管理
+    public void onDestroyView() {
+        super.onDestroyView();
         mMapView.onDestroy();
         mLocationClient.stopLocation();//停止定位
         mLocationClient.onDestroy();//销毁定位客户端
     }
 
     @Override
-    protected void onResume() {
+    public void onDestroy() {
+        super.onDestroy();
+    }
+
+    @Override
+    public void onStart() {
+        super.onStart();
+
+    }
+
+    @Override
+    public void onResume() {
         super.onResume();
-        //在activity执行onResume时执行mMapView.onResume ()，实现地图生命周期管理
         mMapView.onResume();
     }
 
     @Override
-    protected void onPause() {
+    public void onPause() {
         super.onPause();
-        //在activity执行onPause时执行mMapView.onPause ()，实现地图生命周期管理
         mMapView.onPause();
     }
 
     @Override
-    protected void onSaveInstanceState(Bundle outState) {
+    public void onStop() {
+        super.onStop();
+    }
+
+    @Override
+    public void onDetach() {
+        super.onDetach();
+    }
+
+    @Override
+    public void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
         //在activity执行onSaveInstanceState时执行mMapView.onSaveInstanceState (outState)，实现地图生命周期管理
         mMapView.onSaveInstanceState(outState);
@@ -275,7 +246,7 @@ public class MainActivity extends BaseActivity implements LocationSource, AMapLo
                             + aMapLocation.getDistrict() + ""
                             + aMapLocation.getStreet() + ""
                             + aMapLocation.getStreetNum());
-                    Toast.makeText(getApplicationContext(), buffer.toString(), Toast.LENGTH_LONG).show();
+                    Toast.makeText(getContext(), buffer.toString(), Toast.LENGTH_LONG).show();
                     isFirstLoc = false;
                 }
 
@@ -307,7 +278,7 @@ public class MainActivity extends BaseActivity implements LocationSource, AMapLo
     public void poiSearch(double lat, double lon) {
         PoiSearch.Query query = new PoiSearch.Query("公交站点", "", "");//"150702"为公交站点的poi
         query.setPageSize(20);
-        PoiSearch search = new PoiSearch(this, query);
+        PoiSearch search = new PoiSearch(getContext(), query);
         search.setBound(new PoiSearch.SearchBound(new LatLonPoint(lat, lon), 10000));//哈尔滨的经纬度是45.7784237183, 126.6177728296
         search.setOnPoiSearchListener(this);
         search.searchPOIAsyn();
@@ -394,7 +365,7 @@ public class MainActivity extends BaseActivity implements LocationSource, AMapLo
         snippet = marker.getSnippet();
         final String[] list = snippet.split(";");//提取出每个站点
 
-        View view = getLayoutInflater().inflate(R.layout.view_infowindow, null);//view_infowindow为自定义layout文件
+        View view = getLayoutInflater(getArguments()).inflate(R.layout.view_infowindow, null);//view_infowindow为自定义layout文件
         navigation = (LinearLayout) view.findViewById(R.id.navigation_LL);
         more = (LinearLayout) view.findViewById(R.id.call_LL);
         nameTV = (TextView) view.findViewById(R.id.agent_name);
@@ -431,7 +402,7 @@ public class MainActivity extends BaseActivity implements LocationSource, AMapLo
                 break;
 
             case R.id.call_LL:  //出现更多
-                Intent intent = new Intent(MainActivity.this, MoreInformation.class);
+                Intent intent = new Intent(getActivity(), MoreInformation.class);
 
                 intent.putExtra("more_information", oldMarker.getSnippet());
                 startActivity(intent);
@@ -456,7 +427,7 @@ public class MainActivity extends BaseActivity implements LocationSource, AMapLo
      */
     private void showProgressDialog() {
         if (progDialog == null)
-            progDialog = new ProgressDialog(this);
+            progDialog = new ProgressDialog(getContext());
         progDialog.setProgressStyle(ProgressDialog.STYLE_SPINNER);
         progDialog.setIndeterminate(false);
         progDialog.setCancelable(true);
@@ -485,7 +456,7 @@ public class MainActivity extends BaseActivity implements LocationSource, AMapLo
                     final WalkPath walkPath = mWalkRouteResult.getPaths()
                             .get(0);
                     WalkRouteOverlay walkRouteOverlay = new WalkRouteOverlay(
-                            this, aMap, walkPath,
+                            getContext(), aMap, walkPath,
                             mWalkRouteResult.getStartPos(),
                             mWalkRouteResult.getTargetPos());
                     walkRouteOverlay.removeFromMap();
@@ -493,13 +464,13 @@ public class MainActivity extends BaseActivity implements LocationSource, AMapLo
                     walkRouteOverlay.zoomToSpan();
                     mBottomLayout.setVisibility(View.VISIBLE);
                 } else if (result != null && result.getPaths() == null) {
-                    Toast.makeText(MainActivity.this, "no result", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(getContext(), "no result", Toast.LENGTH_SHORT).show();
                 }
             } else {
-                Toast.makeText(MainActivity.this, "no result", Toast.LENGTH_SHORT).show();
+                Toast.makeText(getContext(), "no result", Toast.LENGTH_SHORT).show();
             }
         } else {
-            ToastUtil.showerror(this.getApplicationContext(), i);
+            ToastUtil.showerror(getContext(), i);
         }
     }
 }
