@@ -1,21 +1,15 @@
 package com.example.uuuup.myapplication.fragment;
 
 
-import android.annotation.SuppressLint;
 import android.app.ProgressDialog;
-import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
-import android.support.design.widget.NavigationView;
 import android.support.v4.app.Fragment;
-import android.support.v4.widget.DrawerLayout;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.inputmethod.InputMethodManager;
-import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
@@ -47,8 +41,6 @@ import com.amap.api.services.route.RouteSearch;
 
 import com.amap.api.services.route.WalkPath;
 import com.amap.api.services.route.WalkRouteResult;
-import com.example.uuuup.myapplication.BaseFragment;
-import com.example.uuuup.myapplication.MainActivity;
 import com.example.uuuup.myapplication.MoreInformation;
 import com.example.uuuup.myapplication.R;
 import com.example.uuuup.myapplication.ToastUtil;
@@ -86,9 +78,7 @@ public class FragmentOne extends Fragment implements  LocationSource, AMapLocati
     private ProgressDialog progDialog = null;// 搜索时进度条
 
     public static FragmentOne newInstance(){
-        Bundle bundle = new Bundle();
         FragmentOne fragment = new FragmentOne();
-        fragment.setArguments(bundle);
         return fragment;
     }
 
@@ -96,7 +86,8 @@ public class FragmentOne extends Fragment implements  LocationSource, AMapLocati
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         // TODO Auto-generated method stub
         View view = inflater.inflate(R.layout.fragment_one,container,false);
-        mMapView = (MapView) getView().findViewById(R.id.map);
+        mMapView  = (MapView) view.findViewById(R.id.map);
+        mMapView.onCreate(savedInstanceState);
         initmap();
         return view;
     }
@@ -106,7 +97,6 @@ public class FragmentOne extends Fragment implements  LocationSource, AMapLocati
         // TODO Auto-generated method stub
         super.onActivityCreated(savedInstanceState);
     }
-
 
     public void initmap(){
         if (aMap == null) {
@@ -123,9 +113,6 @@ public class FragmentOne extends Fragment implements  LocationSource, AMapLocati
             //添加指南针
             aMap.getCameraPosition(); //方法可以获取地图的旋转角度
             settings.setCompassEnabled(true);
-
-            //每像素代表几米
-            //float scale = aMap.getScalePerPixel();
         }
         //初始化对象
         mRouteSearch = new RouteSearch(getContext());

@@ -1,17 +1,16 @@
 package com.example.uuuup.myapplication.fragment;
 
-import com.example.uuuup.myapplication.Constants;
-
 import android.os.Bundle;
 
-public class FragmentFour extends FragmentBase {
+import com.example.uuuup.myapplication.Constants;
 
-    public static FragmentFour newInstance(String s){
+public class FragmentThree extends FragmentBase{
+
+    public static FragmentThree newInstance(String s){
         Bundle bundle = new Bundle();
         bundle.putString(Constants.KEY_ARGS,s);
-        FragmentFour fragment = new FragmentFour();
+        FragmentThree fragment = new FragmentThree();
         fragment.setArguments(bundle);
         return fragment;
     }
-
 }

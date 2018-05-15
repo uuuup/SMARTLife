@@ -1,29 +1,16 @@
 package com.example.uuuup.myapplication;
 
 
-import android.app.Fragment;
-import android.content.Intent;
-import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.FragmentTransaction;
-import android.view.View;
-import android.widget.Button;
-import android.widget.ImageView;
 
 import com.ashokvarma.bottomnavigation.BadgeItem;
 import com.ashokvarma.bottomnavigation.BottomNavigationBar;
 import com.ashokvarma.bottomnavigation.BottomNavigationItem;
-import com.example.uuuup.myapplication.BaseFragment;
 import com.example.uuuup.myapplication.fragment.FragmentFour;
 import com.example.uuuup.myapplication.fragment.FragmentOne;
 import com.example.uuuup.myapplication.fragment.FragmentThree;
 import com.example.uuuup.myapplication.fragment.FragmentTwo;
-import com.google.android.gms.appindexing.Action;
-import com.google.android.gms.appindexing.AppIndex;
-import com.google.android.gms.appindexing.Thing;
-import com.google.android.gms.common.api.GoogleApiClient;
-
-import java.util.EventListener;
 
 public class firstActivity extends BaseActivity implements BottomNavigationBar.OnTabSelectedListener  {
     private BottomNavigationBar mBottomNavigationBar;
