@@ -53,6 +53,7 @@ import java.util.Date;
 public class FragmentOne extends Fragment implements  LocationSource, AMapLocationListener, PoiSearch.OnPoiSearchListener,
         AMap.OnMarkerClickListener, AMap.OnMapClickListener, AMap.InfoWindowAdapter, AMap.OnInfoWindowClickListener,
         View.OnClickListener, RouteSearch.OnRouteSearchListener {
+    private View view;
     private MapView mMapView;//地图容器
     private boolean isFirstLoc = true;//标识，用于判断是否只显示一次定位信息和用户重新定位
     private Handler handler ;
@@ -85,10 +86,8 @@ public class FragmentOne extends Fragment implements  LocationSource, AMapLocati
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         // TODO Auto-generated method stub
-        View view = inflater.inflate(R.layout.fragment_one,container,false);
-        mMapView  = (MapView) view.findViewById(R.id.map);
-        mMapView.onCreate(savedInstanceState);
-        initmap();
+        view = inflater.inflate(R.layout.fragment_one,container,false);
+
         return view;
     }
 
@@ -96,6 +95,10 @@ public class FragmentOne extends Fragment implements  LocationSource, AMapLocati
     public void onActivityCreated(Bundle savedInstanceState) {
         // TODO Auto-generated method stub
         super.onActivityCreated(savedInstanceState);
+        getActivity().setContentView(R.layout.fragment_one);
+        mMapView  = (MapView) view.findViewById(R.id.fragment_one_map);
+        mMapView.onCreate(savedInstanceState);
+        initmap();
     }
 
     public void initmap(){
@@ -146,6 +149,10 @@ public class FragmentOne extends Fragment implements  LocationSource, AMapLocati
         mMapView.onDestroy();
         mLocationClient.stopLocation();//停止定位
         mLocationClient.onDestroy();//销毁定位客户端
+    }
+    @Override
+    public void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
     }
 
     @Override
