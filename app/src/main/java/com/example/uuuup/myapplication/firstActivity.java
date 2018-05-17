@@ -67,7 +67,7 @@ public class firstActivity extends BaseActivity implements BottomNavigationBar.O
                 break;
             case 1:
                 if (mFragmentTwo == null) {
-                    mFragmentTwo = FragmentTwo.newInstance("two  Fragment");
+                    mFragmentTwo = FragmentTwo.newInstance();
                 }
                 transaction.replace(R.id.content, mFragmentTwo);
                 break;

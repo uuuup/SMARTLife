@@ -16,6 +16,7 @@ import com.example.uuuup.myapplication.R;
  */
 
 public class FragmentBase extends Fragment {
+
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
