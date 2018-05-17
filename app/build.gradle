@@ -25,6 +25,7 @@ dependencies {
     compile fileTree(include: ['*.jar'], dir: 'libs')
     compile files('libs/AMap2DMap_2.9.0_AMapSearch_3.4.0_AMapLocation_2.8.0_20160811.jar')
     compile files('libs/AMap_Location_V2.8.0_20160811.jar')
+    compile files('libs/universal-image-loader-1.9.5.jar')
     androidTestCompile('com.android.support.test.espresso:espresso-core:2.2.2', {
         exclude group: 'com.android.support', module: 'support-annotations'
     })
