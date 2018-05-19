@@ -1,0 +1,7 @@
+<resources>
+    <!-- Base application theme. -->
+    <style name="MyStyle" parent="android:Theme.Light">
+        <item name="android:windowTitleSize">50dp</item>
+        <item name="android:windowTitleBackgroundStyle">@color/colorAccent</item>
+    </style>
+</resources>

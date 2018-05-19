@@ -43,7 +43,8 @@
 
         <activity android:name=".MainActivity" />
         <activity android:name=".MoreInformation" />
-        <activity android:name=".firstActivity" />
+        <activity android:name=".firstActivity" android:screenOrientation="portrait"/>
+        <activity android:name=".chat.view.ChatRoomActivity" android:screenOrientation="portrait"/>
         <activity android:name=".ChatActivity"/>
 
         <meta-data

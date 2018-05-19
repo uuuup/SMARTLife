@@ -3,10 +3,13 @@ package com.example.uuuup.myapplication;
 
 import android.os.Bundle;
 import android.support.v4.app.FragmentTransaction;
+import android.view.Window;
+import android.widget.Toast;
 
 import com.ashokvarma.bottomnavigation.BadgeItem;
 import com.ashokvarma.bottomnavigation.BottomNavigationBar;
 import com.ashokvarma.bottomnavigation.BottomNavigationItem;
+import com.example.uuuup.myapplication.fragment.FragmentExtra;
 import com.example.uuuup.myapplication.fragment.FragmentFour;
 import com.example.uuuup.myapplication.fragment.FragmentOne;
 import com.example.uuuup.myapplication.fragment.FragmentThree;
@@ -18,6 +21,7 @@ public class firstActivity extends BaseActivity implements BottomNavigationBar.O
     private FragmentTwo mFragmentTwo;
     private FragmentThree mFragmentThree;
     private FragmentFour mFragmentFour;
+    private FragmentExtra mFragmentExtra;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -48,24 +52,35 @@ public class firstActivity extends BaseActivity implements BottomNavigationBar.O
                 .initialise();
 
         mBottomNavigationBar.setTabSelectedListener(this);
-        setDefaultFragment();
+        //setDefaultFragment();
+        FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
+        if (mFragmentOne == null) {
+            mFragmentOne = FragmentOne.newInstance();
+        }
+        transaction.replace(R.id.content, mFragmentOne);
+
     }
 
     private void setDefaultFragment() {
         FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
-        mFragmentOne = FragmentOne.newInstance();
-        transaction.replace(R.id.content, mFragmentOne);
+        if (mFragmentThree == null) {
+            mFragmentThree = FragmentThree.newInstance("Third Fragment");
+        }
+        transaction.replace(R.id.content, mFragmentThree);
     }
 
     @Override
     public void onTabSelected(int position) {
         FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
-        switch (position) {
+            switch (position) {
             case 0:
                 mFragmentOne = FragmentOne.newInstance();
                 transaction.replace(R.id.content, mFragmentOne);
                 break;
             case 1:
+                //if (mFragmentExtra == null){
+                  //  mFragmentExtra = FragmentExtra.newInstance();
+                //}
                 if (mFragmentTwo == null) {
                     mFragmentTwo = FragmentTwo.newInstance();
                 }
@@ -83,7 +98,6 @@ public class firstActivity extends BaseActivity implements BottomNavigationBar.O
                 break;
         }
         transaction.commit();
-
     }
 
     @Override

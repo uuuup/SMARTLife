@@ -6,7 +6,7 @@ import com.example.uuuup.myapplication.R;
 import com.example.uuuup.myapplication.base.ContactAdapter;
 import com.example.uuuup.myapplication.base.DividerItemDecoration;
 
-import com.example.uuuup.myapplication.chat.view.ChatRoomActivity;
+import com.example.uuuup.myapplication.base.MySwipeAdapter;
 import com.example.uuuup.myapplication.firstActivity;
 
 import android.content.Intent;
@@ -25,24 +25,24 @@ import android.widget.Toast;
 
 import java.util.ArrayList;
 
-public class FragmentTwo extends Fragment {
+public class FragmentExtra extends Fragment {
 
-    private RecyclerView contactList;
+    private ListView contactList;
     private String[] contactNames;
     private ArrayList<String> car_list = new ArrayList<>();
     private LinearLayoutManager layoutManager;
-    private ContactAdapter adapter;
+    private MySwipeAdapter adapter;
     private boolean flag = false;
 
-    public static FragmentTwo newInstance(){
-        FragmentTwo fragment = new FragmentTwo();
+    public static FragmentExtra newInstance(){
+        FragmentExtra fragment = new FragmentExtra();
         return fragment;
     }
 
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        View view = inflater.inflate(R.layout.fragment_two,container,false);
+        View view = inflater.inflate(R.layout.fragment_extra,container,false);
         return view;
     }
 
@@ -65,54 +65,23 @@ public class FragmentTwo extends Fragment {
     }
 
     private void initview(){
-        contactList = (RecyclerView) getView().findViewById(R.id.contact_list);
+        contactList = (ListView) getView().findViewById(R.id.lv_main);
         layoutManager = new LinearLayoutManager(getContext());
-        adapter = new ContactAdapter(getContext(), car_list);
-        contactList.setLayoutManager(layoutManager);
-        contactList.addItemDecoration(new DividerItemDecoration(getContext(), DividerItemDecoration.VERTICAL_LIST));
+        adapter = new MySwipeAdapter(getContext(), car_list);
         contactList.setAdapter(adapter);
 
         adapter.setOnItemClickListener(new ContactAdapter.OnItemClickListener() {//点击监听
             @Override
             public void onItemClick(View v, int position) {
-                Intent intent = new Intent(getActivity(), ChatRoomActivity.class);
+                Intent intent = new Intent(getActivity(), ChatActivity.class);
                 startActivity(intent);
                 //Toast.makeText(getActivity(),"the number"+position+"has been clicked",Toast.LENGTH_SHORT).show();
             }
         });
         adapter.setOnItemLongClickListener(new ContactAdapter.OnItemLongClickListener() {//长点击监听
-            @Override
-            public void onItemLongClick(View v, int position) {
+            @Override public void onItemLongClick(View v, int position) {
                 //Toast.makeText(getActivity(),"the car "+car_list.get(position)+" has been removed",Toast.LENGTH_SHORT).show();
             }
         });
-        adapter.setOnOpenClickListener(new ContactAdapter.OnOpenClickListener() {
-            @Override
-            public void onOpenClick(View v, int position) {
-                String str = car_list.get(position);
-                car_list.remove(position);
-                car_list.add(0, str);
-                adapter.notifyItemRangeChanged(0,car_list.size());
-            }
-        });
-
-        adapter.setOnDeleteClickListener(new ContactAdapter.OnDeleteClickListener(){
-            @Override
-            public void onDeleteClick(View v, int position) {
-                car_list.remove(position);
-                adapter.notifyItemRemoved(position);
-            }
-        });
-
-        Button button_add = (Button) getView().findViewById(R.id.add_item);
-        button_add.setOnClickListener(new View.OnClickListener() {//增加
-            @Override
-            public void onClick(View v) {
-                car_list.add(0, "new car");
-                adapter.notifyItemInserted(0);
-                contactList.scrollToPosition(0);
-            }
-        });
     }
-
 }

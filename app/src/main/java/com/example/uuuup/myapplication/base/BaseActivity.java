@@ -1,6 +1,7 @@
 package com.example.uuuup.myapplication.base;
 
 import android.annotation.TargetApi;
+import android.app.Activity;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.IdRes;
@@ -11,7 +12,7 @@ import android.view.WindowManager;
 
 /**
  */
-public class BaseActivity extends AppCompatActivity implements View.OnClickListener{
+public class BaseActivity extends Activity implements View.OnClickListener{
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
