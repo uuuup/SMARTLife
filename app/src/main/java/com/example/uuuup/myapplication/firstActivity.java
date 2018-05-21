@@ -1,6 +1,7 @@
 package com.example.uuuup.myapplication;
 
 
+import android.app.FragmentManager;
 import android.os.Bundle;
 import android.support.v4.app.FragmentTransaction;
 import android.view.Window;
@@ -45,9 +46,9 @@ public class firstActivity extends BaseActivity implements BottomNavigationBar.O
 //        mBottomNavigationBar.setBackgroundStyle(BottomNavigationBar.BACKGROUND_STYLE_RIPPLE);
         mBottomNavigationBar.setBarBackgroundColor(R.color.blue);//set background color for navigation bar
         mBottomNavigationBar.setInActiveColor(R.color.white);//unSelected icon color
-        mBottomNavigationBar.addItem(new BottomNavigationItem(R.drawable.icon_one, "公交").setActiveColorResource(R.color.green).setBadgeItem(badgeItem))
-                .addItem(new BottomNavigationItem(R.drawable.icon_two, "聊天室").setActiveColorResource(R.color.orange))
-                .addItem(new BottomNavigationItem(R.drawable.icon_three, "设置").setActiveColorResource(R.color.lime))
+        mBottomNavigationBar.addItem(new BottomNavigationItem(R.drawable.bus, "公交").setActiveColorResource(R.color.green))
+                .addItem(new BottomNavigationItem(R.drawable.room, "聊天室").setActiveColorResource(R.color.orange))
+                .addItem(new BottomNavigationItem(R.drawable.user_center, "个人中心").setActiveColorResource(R.color.lime))
                 .setFirstSelectedPosition(0)
                 .initialise();
 
@@ -58,13 +59,13 @@ public class firstActivity extends BaseActivity implements BottomNavigationBar.O
             mFragmentOne = FragmentOne.newInstance();
         }
         transaction.replace(R.id.content, mFragmentOne);
-
+        transaction.commit();
     }
 
     private void setDefaultFragment() {
         FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
         if (mFragmentThree == null) {
-            mFragmentThree = FragmentThree.newInstance("Third Fragment");
+            mFragmentThree = FragmentThree.newInstance();
         }
         transaction.replace(R.id.content, mFragmentThree);
     }
@@ -78,9 +79,6 @@ public class firstActivity extends BaseActivity implements BottomNavigationBar.O
                 transaction.replace(R.id.content, mFragmentOne);
                 break;
             case 1:
-                //if (mFragmentExtra == null){
-                  //  mFragmentExtra = FragmentExtra.newInstance();
-                //}
                 if (mFragmentTwo == null) {
                     mFragmentTwo = FragmentTwo.newInstance();
                 }
@@ -88,7 +86,7 @@ public class firstActivity extends BaseActivity implements BottomNavigationBar.O
                 break;
             case 2:
                 if (mFragmentThree == null) {
-                    mFragmentThree = FragmentThree.newInstance("Third Fragment");
+                    mFragmentThree = FragmentThree.newInstance();
                 }
                 transaction.replace(R.id.content, mFragmentThree);
                 break;

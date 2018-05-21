@@ -103,16 +103,6 @@ public class FragmentTwo extends Fragment {
                 adapter.notifyItemRemoved(position);
             }
         });
-
-        Button button_add = (Button) getView().findViewById(R.id.add_item);
-        button_add.setOnClickListener(new View.OnClickListener() {//增加
-            @Override
-            public void onClick(View v) {
-                car_list.add(0, "new car");
-                adapter.notifyItemInserted(0);
-                contactList.scrollToPosition(0);
-            }
-        });
     }
 
 }
