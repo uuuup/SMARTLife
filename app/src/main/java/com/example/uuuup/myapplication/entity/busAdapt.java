@@ -6,11 +6,9 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.CheckBox;
 import android.widget.CompoundButton;
-import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.example.uuuup.myapplication.R;
-import com.example.uuuup.myapplication.utils.Msg;
 
 import java.util.List;
 

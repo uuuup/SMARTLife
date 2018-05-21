@@ -1,17 +1,20 @@
 package com.example.uuuup.myapplication.chat.view;
 
 import android.content.DialogInterface;
-import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.view.View;
 import android.widget.EditText;
-import android.widget.ListView;
 
 import com.example.uuuup.myapplication.R;
 import com.example.uuuup.myapplication.chat.bean.ChatBean;
 import com.example.uuuup.myapplication.chat.socket.SocketThread;
+
+import java.util.ArrayList;
+import java.util.List;
 
 import butterknife.Bind;
 import butterknife.ButterKnife;
@@ -19,10 +22,11 @@ import butterknife.OnClick;
 
 public class ChatRoomActivity extends AppCompatActivity implements ChatView {
     @Bind(R.id.listView)
-    ListView listView;
+    RecyclerView msgRecyclerView;
     @Bind(R.id.etContent)
     EditText etContent;
     private ChatAdapter mAdapter;
+    private List<ChatBean> Bean_List = new ArrayList<ChatBean>();
 
     private String userId = String.valueOf(System.currentTimeMillis());
 
@@ -34,8 +38,11 @@ public class ChatRoomActivity extends AppCompatActivity implements ChatView {
         setContentView(R.layout.activity_chat_room);
         ButterKnife.bind(this);
 
-        mAdapter = new ChatAdapter(this, userId);
-        listView.setAdapter(mAdapter);
+        LinearLayoutManager layoutManager = new LinearLayoutManager(this);
+        msgRecyclerView.setLayoutManager(layoutManager);
+
+        mAdapter = new ChatAdapter(this, userId, Bean_List);
+        msgRecyclerView.setAdapter(mAdapter);
 
         //启动线程，接收服务器发送过来的数据
         thread = new SocketThread(this);
@@ -50,7 +57,6 @@ public class ChatRoomActivity extends AppCompatActivity implements ChatView {
                 .setPositiveButton("ok", new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
-
                     }
                 }).show();
     }
@@ -58,8 +64,8 @@ public class ChatRoomActivity extends AppCompatActivity implements ChatView {
     @OnClick(R.id.btnSend)
     public void onClick(View view) {
         String msg = etContent.getText().toString();
-        etContent.setText(null);
         thread.sendMsg(msg);
+        etContent.setText(null);
     }
 
     @Override
@@ -68,7 +74,6 @@ public class ChatRoomActivity extends AppCompatActivity implements ChatView {
         thread.sendMsg("exit");
         thread.interrupt();
     }
-
 
     @Override
     public String getUserId() {
@@ -87,6 +92,10 @@ public class ChatRoomActivity extends AppCompatActivity implements ChatView {
 
     @Override
     public void receiveMsg(ChatBean bean) {
-        mAdapter.addChatBean(bean);
+        if (bean == null) return;
+
+        Bean_List.add(bean);
+        mAdapter.notifyItemInserted(Bean_List.size() - 1); // 当有新消息时，刷新ListView中的显示
+        msgRecyclerView.scrollToPosition(Bean_List.size() - 1); // 将ListView定位到最后一行
     }
 }

@@ -43,9 +43,6 @@ public class SocketThread extends Thread {
                 ChatBean bean = new ChatBean("join", chatView.getUserId());
                 out.println(new Gson().toJson(bean));
                 out.flush();
-                //ChatBean bean1 = new ChatBean("hello,world", chatView.getUserId());
-                //out.println(new Gson().toJson(bean1));
-                //out.flush();
             }
         } catch (UnknownHostException e1) {
             e1.printStackTrace();

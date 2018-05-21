@@ -47,11 +47,13 @@ import com.amap.api.services.route.RouteSearch;
 import com.amap.api.services.route.WalkPath;
 import com.amap.api.services.route.WalkRouteResult;
 import com.ashokvarma.bottomnavigation.BottomNavigationBar;
+import com.example.uuuup.myapplication.base.TitleActivity;
+
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 
-public class MainActivity extends BaseActivity implements LocationSource, AMapLocationListener, PoiSearch.OnPoiSearchListener,
+public class MainActivity extends TitleActivity implements LocationSource, AMapLocationListener, PoiSearch.OnPoiSearchListener,
         AMap.OnMarkerClickListener, AMap.OnMapClickListener, AMap.InfoWindowAdapter, AMap.OnInfoWindowClickListener,
         View.OnClickListener, RouteSearch.OnRouteSearchListener {
 
@@ -81,57 +83,14 @@ public class MainActivity extends BaseActivity implements LocationSource, AMapLo
     private TextView mRotueTimeDes, mRouteDetailDes;
     private ProgressDialog progDialog = null;// 搜索时进度条
 
-    /** DrawerLayout */
-    private DrawerLayout drawerLayout;
-    //侧滑菜单栏
-    private NavigationView navigationView;
-    //标题栏-侧滑-按钮
-    ImageView menu;
-
-    private BottomNavigationBar mBottomNavigationBar;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        /*
-        //侧拉菜单
-        drawerLayout = (DrawerLayout) findViewById(R.id.activity_main);
-        navigationView = (NavigationView) findViewById(R.id.nav);
-        View headerView = navigationView.getHeaderView(0);
-        //开启手势滑动打开侧滑菜单栏，如果要关闭手势滑动，将后面的UNLOCKED替换成LOCKED_CLOSED 即可
-        drawerLayout.setDrawerLockMode(DrawerLayout.LOCK_MODE_UNLOCKED);
-
-        navigationView.setNavigationItemSelectedListener(new NavigationView.OnNavigationItemSelectedListener() {
-            @Override
-            public boolean onNavigationItemSelected( MenuItem item) {
-                switch (item.getItemId()){
-                    case R.id.menu_History:
-                        Toast.makeText(MainActivity.this,item.getTitle().toString(),Toast.LENGTH_SHORT).show();
-                        //Intent intent1 = new Intent();
-                        //intent1.setClass(MainActivity.this, activity_AboutUs.class);
-                        //startActivity(intent1);
-                        //此处不能加Finsh杀死界面否则点击返回会退出程序而不是回到主界面
-                        break;
-                    case R.id.menu_Setting:
-                        Toast.makeText(MainActivity.this,item.getTitle().toString(),Toast.LENGTH_SHORT).show();
-                        //Intent intent2 = new Intent();
-                        //intent2.setClass(MainActivity.this, activity_AboutUs.class);
-                        //startActivity(intent2);
-                        break;
-                    case R.id.menu_Feedback:
-                        Toast.makeText(MainActivity.this,item.getTitle().toString(),Toast.LENGTH_SHORT).show();
-                        break;
-                    case R.id.menu_AboutUs:
-                        Toast.makeText(MainActivity.this,item.getTitle().toString(),Toast.LENGTH_SHORT).show();
-                        break;
-                }
-                drawerLayout.closeDrawer(navigationView);
-                return true;
-            }
-        });*/
-
-
+        setTitle("标题栏");
+        showBackwardView(R.string.text_back,true);
+        showForwardView(R.string.text_forward,true);
 
         //下限按钮
         Button forceOffline = (Button) findViewById(R.id.force_offline);
@@ -435,7 +394,6 @@ public class MainActivity extends BaseActivity implements LocationSource, AMapLo
 
                 intent.putExtra("more_information", oldMarker.getSnippet());
                 startActivity(intent);
-                //PhoneCallUtils.call("028-"); //TODO 处理电话号码
                 break;
         }
     }

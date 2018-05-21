@@ -1,13 +1,10 @@
 package com.example.uuuup.myapplication.fragment;
 
-import com.example.uuuup.myapplication.ChatActivity;
-import com.example.uuuup.myapplication.LoginActivity;
 import com.example.uuuup.myapplication.R;
 import com.example.uuuup.myapplication.base.ContactAdapter;
 import com.example.uuuup.myapplication.base.DividerItemDecoration;
 
 import com.example.uuuup.myapplication.chat.view.ChatRoomActivity;
-import com.example.uuuup.myapplication.firstActivity;
 
 import android.content.Intent;
 import android.os.Bundle;
@@ -18,10 +15,6 @@ import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.Window;
-import android.widget.Button;
-import android.widget.ListView;
-import android.widget.Toast;
 
 import java.util.ArrayList;
 

@@ -29,9 +29,10 @@
         <meta-data
             android:name="com.amap.api.v2.apikey"
             android:value="eef9154126dd1e1e13cdac19459dbcea" />
+
         <activity
             android:name=".firstActivity"
-            android:screenOrientation="portrait" >
+            android:screenOrientation="portrait">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
@@ -44,18 +45,17 @@
 
         <activity android:name=".MainActivity" />
         <activity android:name=".MoreInformation" />
-    <activity android:name=".LoginActivity"/>
-
+        <activity android:name=".LoginActivity" />
         <activity
             android:name=".chat.view.ChatRoomActivity"
             android:screenOrientation="portrait" />
-        <activity android:name=".ChatActivity" />
 
         <meta-data
             android:name="com.google.android.gms.version"
             android:value="@integer/google_play_services_version" />
 
-        <activity android:name=".default_bus_Activity"></activity>
+        <activity android:name=".default_bus_Activity" />
+        <activity android:name=".base.TitleActivity"></activity>
     </application>
 
 </manifest>

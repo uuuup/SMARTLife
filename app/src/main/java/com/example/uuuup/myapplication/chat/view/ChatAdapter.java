@@ -1,6 +1,7 @@
 package com.example.uuuup.myapplication.chat.view;
 
 import android.content.Context;
+import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -22,52 +23,20 @@ import butterknife.ButterKnife;
 /**
  * Created by Administrator on 2016/4/16 0016.
  */
-public class ChatAdapter extends BaseAdapter {
+public class ChatAdapter extends RecyclerView.Adapter<ChatAdapter.ViewHolder> {
 
     private List<ChatBean> mList;
     private LayoutInflater mInflater;
     private SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
     private String userId;
 
-    public ChatAdapter(Context ctx, String userId) {
+    public ChatAdapter(Context ctx, String userId,  List<ChatBean> List) {
         mInflater = LayoutInflater.from(ctx);
-        mList = new ArrayList<>();
+        mList = List;
         this.userId = userId;
     }
 
-    public void addChatBean(ChatBean chatBean) {
-        if (chatBean == null) return;
-        mList.add(chatBean);
-        notifyDataSetChanged();
-    }
-
-    @Override
-    public int getCount() {
-        return mList.size();
-    }
-
-    @Override
-    public Object getItem(int position) {
-        return mList.get(position);
-    }
-
-    @Override
-    public long getItemId(int position) {
-        return position;
-    }
-
-    @Override
-    public View getView(int position, View convertView, ViewGroup parent) {
-        if (convertView == null) {
-            convertView = mInflater.inflate(R.layout.lv_item_chat, parent, false);
-            convertView.setTag(new ViewHolder(convertView));
-        }
-        ViewHolder holder = (ViewHolder) convertView.getTag();
-        holder.init(position);
-        return convertView;
-    }
-
-    class ViewHolder {
+    static class ViewHolder extends RecyclerView.ViewHolder {
         @Bind(R.id.tvTime)
         TextView tvTime;
         @Bind(R.id.tvLeft)
@@ -82,35 +51,53 @@ public class ChatAdapter extends BaseAdapter {
         FrameLayout frameRight;
 
         public ViewHolder(View v) {
+            super(v);
             ButterKnife.bind(this, v);
         }
+    }
 
-        public void init(int position) {
-            ChatBean bean = mList.get(position);
-            if (position == 0 || position > 0 && bean.time - mList.get(position - 1).time > 60000) {
-                tvTime.setVisibility(View.VISIBLE);
-                tvTime.setText(format.format(bean.time));
+    @Override
+    public ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
+        View convertView  = mInflater.inflate(R.layout.lv_item_chat, parent, false);
+        return new ViewHolder(convertView);
+    }
+
+    @Override
+    public void onBindViewHolder(ViewHolder holder, int position) {
+        ChatBean bean = mList.get(position);
+        if (position == 0 || position > 0 && bean.time - mList.get(position - 1).time > 60000) {
+            holder.tvTime.setVisibility(View.VISIBLE);
+            holder.tvTime.setText(format.format(bean.time));
+        } else {
+            holder.tvTime.setVisibility(View.GONE);
+        }
+        holder.frameLeft.setVisibility(View.GONE);
+        holder.frameRight.setVisibility(View.GONE);
+        if (bean.content.equals("exit")) {
+            holder.tvTip.setVisibility(View.VISIBLE);
+            holder.tvTip.setText(bean.name.equals(userId) ? "您已退出讨论组" : bean.name + "已退出讨论组");
+        } else if (bean.content.equals("join")) {
+            holder.tvTip.setVisibility(View.VISIBLE);
+            holder.tvTip.setText(bean.name.equals(userId) ? "您已加入讨论组" : bean.name + "加入讨论组");
+        } else {
+            holder.tvTip.setVisibility(View.GONE);
+            holder.frameLeft.setVisibility(bean.name.equals(userId) ? View.GONE : View.VISIBLE);
+            holder.frameRight.setVisibility(bean.name.equals(userId) ? View.VISIBLE : View.GONE);
+            if (bean.name.equals(userId)) {
+                holder.tvRight.setText(bean.content);
             } else {
-                tvTime.setVisibility(View.GONE);
-            }
-            frameLeft.setVisibility(View.GONE);
-            frameRight.setVisibility(View.GONE);
-            if (bean.content.equals("exit")) {
-                tvTip.setVisibility(View.VISIBLE);
-                tvTip.setText(bean.name.equals(userId) ? "您已退出讨论组" : bean.name + "已退出讨论组");
-            } else if (bean.content.equals("join")) {
-                tvTip.setVisibility(View.VISIBLE);
-                tvTip.setText(bean.name.equals(userId) ? "您已加入讨论组" : bean.name + "加入讨论组");
-            } else {
-                tvTip.setVisibility(View.GONE);
-                frameLeft.setVisibility(bean.name.equals(userId) ? View.GONE : View.VISIBLE);
-                frameRight.setVisibility(bean.name.equals(userId) ? View.VISIBLE : View.GONE);
-                if (bean.name.equals(userId)) {
-                    tvRight.setText(bean.content);
-                } else {
-                    tvLeft.setText(bean.content);
-                }
+                holder.tvLeft.setText(bean.content);
             }
         }
+    }
+
+    @Override
+    public long getItemId(int position) {
+        return position;
+    }
+
+    @Override
+    public int getItemCount() {
+        return mList.size();
     }
 }

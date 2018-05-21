@@ -1,33 +1,42 @@
 package com.example.uuuup.myapplication;
 
 
-import android.app.FragmentManager;
 import android.os.Bundle;
 import android.support.v4.app.FragmentTransaction;
-import android.view.Window;
-import android.widget.Toast;
+import android.view.View;
+import android.widget.Button;
+import android.widget.TextView;
 
 import com.ashokvarma.bottomnavigation.BadgeItem;
 import com.ashokvarma.bottomnavigation.BottomNavigationBar;
 import com.ashokvarma.bottomnavigation.BottomNavigationItem;
-import com.example.uuuup.myapplication.fragment.FragmentExtra;
-import com.example.uuuup.myapplication.fragment.FragmentFour;
+import com.example.uuuup.myapplication.base.*;
 import com.example.uuuup.myapplication.fragment.FragmentOne;
 import com.example.uuuup.myapplication.fragment.FragmentThree;
 import com.example.uuuup.myapplication.fragment.FragmentTwo;
 
-public class firstActivity extends BaseActivity implements BottomNavigationBar.OnTabSelectedListener  {
+public class firstActivity extends TitleActivity implements BottomNavigationBar.OnTabSelectedListener  {
     private BottomNavigationBar mBottomNavigationBar;
     private FragmentOne mFragmentOne;
     private FragmentTwo mFragmentTwo;
     private FragmentThree mFragmentThree;
-    private FragmentFour mFragmentFour;
-    private FragmentExtra mFragmentExtra;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_first);
+
+        android.support.v7.app.ActionBar actionBar= getSupportActionBar();
+        if(actionBar!=null)
+        {
+            actionBar.hide();
+        }
+
+        setTitle("智慧公交");
+        showBackwardView(R.string.text_back,true);
+        showForwardView(R.string.text_forward,false);
+
+
         mBottomNavigationBar = (BottomNavigationBar) findViewById(R.id.bottom_navigation_bar);
 
         /*** the setting for BadgeItem ***/
@@ -60,14 +69,6 @@ public class firstActivity extends BaseActivity implements BottomNavigationBar.O
         }
         transaction.replace(R.id.content, mFragmentOne);
         transaction.commit();
-    }
-
-    private void setDefaultFragment() {
-        FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
-        if (mFragmentThree == null) {
-            mFragmentThree = FragmentThree.newInstance();
-        }
-        transaction.replace(R.id.content, mFragmentThree);
     }
 
     @Override
@@ -107,4 +108,5 @@ public class firstActivity extends BaseActivity implements BottomNavigationBar.O
     public void onTabReselected(int position) {
 
     }
+
 }

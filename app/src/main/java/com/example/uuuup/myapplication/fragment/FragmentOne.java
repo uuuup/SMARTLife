@@ -411,10 +411,8 @@ public class FragmentOne extends Fragment implements  LocationSource, AMapLocati
 
             case R.id.call_LL:  //出现更多
                 Intent intent = new Intent(getActivity(), MoreInformation.class);
-
                 intent.putExtra("more_information", oldMarker.getSnippet());
                 startActivity(intent);
-                //PhoneCallUtils.call("028-"); //TODO 处理电话号码
                 break;
         }
     }

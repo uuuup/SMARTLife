@@ -13,6 +13,7 @@ import android.widget.ImageView;
 
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.load.resource.bitmap.CenterCrop;
+import com.example.uuuup.myapplication.MainActivity;
 import com.example.uuuup.myapplication.R;
 import com.example.uuuup.myapplication.default_bus_Activity;
 import com.example.uuuup.myapplication.entity.item_view;
@@ -61,7 +62,7 @@ public class FragmentThree extends Fragment {
         default_bus.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent intent = new Intent(getActivity(), default_bus_Activity.class);
+                Intent intent = new Intent(getActivity(), MainActivity.class);
                 startActivity(intent);
             }
         });
