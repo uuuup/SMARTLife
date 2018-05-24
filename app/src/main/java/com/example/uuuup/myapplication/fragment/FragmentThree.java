@@ -17,6 +17,7 @@ import com.example.uuuup.myapplication.MainActivity;
 import com.example.uuuup.myapplication.R;
 import com.example.uuuup.myapplication.default_bus_Activity;
 import com.example.uuuup.myapplication.entity.item_view;
+import com.example.uuuup.myapplication.utils.CityActivity;
 
 import jp.wasabeef.glide.transformations.BlurTransformation;
 import jp.wasabeef.glide.transformations.CropCircleTransformation;
@@ -62,7 +63,7 @@ public class FragmentThree extends Fragment {
         default_bus.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent intent = new Intent(getActivity(), MainActivity.class);
+                Intent intent = new Intent(getActivity(), CityActivity.class);
                 startActivity(intent);
             }
         });

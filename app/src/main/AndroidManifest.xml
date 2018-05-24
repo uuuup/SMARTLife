@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
     package="com.example.uuuup.myapplication">
 
     <!-- 允许应用程序改变网络状态 -->
@@ -23,19 +24,20 @@
     <application
         android:allowBackup="true"
         android:icon="@mipmap/app"
-        android:label="智慧生活之交通"
+        android:label="智慧交通"
         android:supportsRtl="true"
-        android:theme="@style/AppTheme">
+        android:theme="@style/AppTheme"
+        tools:replace="android:label">
+
         <meta-data
             android:name="com.amap.api.v2.apikey"
             android:value="eef9154126dd1e1e13cdac19459dbcea" />
 
         <activity
-            android:name=".firstActivity"
+            android:name=".StartActivity"
             android:screenOrientation="portrait">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
-
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
@@ -55,7 +57,11 @@
             android:value="@integer/google_play_services_version" />
 
         <activity android:name=".default_bus_Activity" />
-        <activity android:name=".base.TitleActivity"></activity>
+        <activity android:name=".base.TitleActivity" />
+        <activity
+            android:name=".utils.CityActivity"
+            android:theme="@style/DefaultCityPickerTheme" />
+        <activity android:name=".firstActivity"></activity>
     </application>
 
 </manifest>
