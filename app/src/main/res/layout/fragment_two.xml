@@ -13,45 +13,18 @@
         android:gravity="center"
         android:orientation="horizontal">
 
-        <RelativeLayout
-            android:layout_width="0dp"
-            android:layout_height="match_parent"
-            android:layout_weight="1">
-
-            <EditText
-                android:id="@+id/edittext"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:layout_marginBottom="8dp"
-                android:layout_marginLeft="10dp"
-                android:background="@drawable/search_view"
-                android:hint="请输入搜索内容"
-                android:maxLength="10"
-                android:paddingLeft="15dp"
-                android:textSize="15sp" />
-
-            <ImageView
-                android:id="@+id/imageview"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_alignParentRight="true"
-                android:layout_centerInParent="true"
-                android:paddingRight="20dp"
-                android:src="@drawable/search"
-                android:visibility="gone" />
-        </RelativeLayout>
-
-        <TextView
-            android:id="@+id/textview"
-            android:layout_width="wrap_content"
-            android:layout_height="match_parent"
-            android:gravity="center"
-            android:paddingLeft="10dp"
-            android:paddingRight="10dp"
-            android:text="搜索"
-            android:textColor="#ffffff"
-            android:textSize="20sp" />
+        <scut.carson_ho.searchview.SearchView
+            android:id="@+id/searchview"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            app:textSizeSearch="5dp"
+            app:textColorSearch="#3F51B5"
+            app:textHintSearch="输入查询关键字"
+            app:searchBlockHeight="150"
+            app:searchBlockColor="#ffffff" />
     </LinearLayout>
+
+
 
     <android.support.v7.widget.RecyclerView
         android:id="@+id/contact_list"

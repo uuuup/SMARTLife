@@ -3,12 +3,16 @@ package com.example.uuuup.myapplication.fragment;
 import android.app.ProgressDialog;
 import android.content.Intent;
 import android.os.Bundle;
-import android.os.Handler;
 import android.support.v4.app.Fragment;
 import android.util.Log;
+
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+
+import android.widget.Button;
+
+import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
@@ -40,10 +44,20 @@ import com.amap.api.services.route.RouteSearch;
 
 import com.amap.api.services.route.WalkPath;
 import com.amap.api.services.route.WalkRouteResult;
+import com.bigkoo.pickerview.builder.OptionsPickerBuilder;
+import com.bigkoo.pickerview.listener.CustomListener;
+import com.bigkoo.pickerview.view.OptionsPickerView;
+
 import com.example.uuuup.myapplication.MoreInformation;
 import com.example.uuuup.myapplication.R;
 import com.example.uuuup.myapplication.ToastUtil;
+import com.example.uuuup.myapplication.bean.CardBean;
 
+import com.bigkoo.pickerview.listener.OnOptionsSelectListener;
+
+import scut.carson_ho.searchview.ICallBack;
+import scut.carson_ho.searchview.SearchView;
+import scut.carson_ho.searchview.bCallBack;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -55,13 +69,12 @@ public class FragmentOne extends Fragment implements  LocationSource, AMapLocati
     private View view;
     private MapView mMapView;//地图容器
     private boolean isFirstLoc = true;//标识，用于判断是否只显示一次定位信息和用户重新定位
-    private Handler handler ;
 
     public AMapLocationClient mLocationClient = null;//声明AMapLocationClient类对象
     public AMapLocationClientOption mLocationOption = null;//声明AMapLocationClientOption对象，实际是关于定位的参数
 
-    private double lat = 39.9088691069;//经纬度 默认为天安门39.9088691069,116.3973823161
-    private double lon = 116.3973823161;
+    private double lat = 45.7784237183;//经纬度 默认为天安门39.9088691069,116.3973823161
+    private double lon = 126.6177728296;
 
     private AMap aMap;//地图类
     private float zoomlevel = 17f; //地图放大级别
@@ -77,7 +90,18 @@ public class FragmentOne extends Fragment implements  LocationSource, AMapLocati
     private TextView mRotueTimeDes, mRouteDetailDes;
     private ProgressDialog progDialog = null;// 搜索时进度条
 
-    public static FragmentOne newInstance(){
+    private Button but_go;
+    private SearchView searchView;
+    private OptionsPickerView pvCustomOptions;
+    private ArrayList<CardBean> cardItem = new ArrayList<>();
+
+    private ArrayList<PoiItem> pois;
+    private ArrayList<Marker> markers = new ArrayList<>();
+    private int Oldoptions1;
+    private boolean isData = false;
+
+
+    public static FragmentOne newInstance() {
         FragmentOne fragment = new FragmentOne();
         return fragment;
     }
@@ -95,8 +119,8 @@ public class FragmentOne extends Fragment implements  LocationSource, AMapLocati
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         // TODO Auto-generated method stub
-        view = inflater.inflate(R.layout.fragment_one,container,false);
-        initview(savedInstanceState,view);
+        view = inflater.inflate(R.layout.fragment_one, container, false);
+        initview(savedInstanceState, view);
         return view;
     }
 
@@ -105,10 +129,32 @@ public class FragmentOne extends Fragment implements  LocationSource, AMapLocati
         // TODO Auto-generated method stub
         super.onActivityCreated(savedInstanceState);
 
+        searchView = (SearchView) getView().findViewById(R.id.searchview);
+
+        // 4. 设置点击搜索按键后的操作（通过回调接口）
+        // 参数 = 搜索框输入的内容
+        searchView.setOnClickSearch(new ICallBack() {
+            @Override
+            public void SearchAciton(String string) {
+                System.out.println("我收到了" + string);
+                Intent intent = new Intent(getActivity(), TextBusActivity.class);
+                intent.putExtra("bus", string);
+                startActivity(intent);
+            }
+        });
+
+        // 5. 设置点击返回按键后的操作（通过回调接口）
+        searchView.setOnClickBack(new bCallBack() {
+            @Override
+            public void BackAciton() {
+            }
+        });
     }
 
-    public void initview( Bundle savedInstanceState,View view){
-        mMapView  = (MapView) view.findViewById(R.id.fragment_one_map);
+    public void initview(Bundle savedInstanceState, View view) {
+
+
+        mMapView = (MapView) view.findViewById(R.id.fragment_one_map);
         mMapView.onCreate(savedInstanceState);
         if (aMap == null) {
             aMap = mMapView.getMap();
@@ -128,11 +174,19 @@ public class FragmentOne extends Fragment implements  LocationSource, AMapLocati
         //初始化对象
         mRouteSearch = new RouteSearch(getContext());
         mRouteSearch.setRouteSearchListener(this);
-
         //开始定位
         location();
-    }
 
+
+        but_go = (Button) view.findViewById(R.id.btn_CustomOptions);
+        but_go.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                pvCustomOptions.show();
+            }
+        });
+
+    }
 
     private void location() {
         mLocationClient = new AMapLocationClient(getContext());//初始化定位
@@ -164,7 +218,7 @@ public class FragmentOne extends Fragment implements  LocationSource, AMapLocati
     public void onDestroy() {
         super.onDestroy();
         mMapView.onDestroy();
-        if(mLocationClient!=null){
+        if (mLocationClient != null) {
             mLocationClient.onDestroy();
         }
     }
@@ -211,7 +265,7 @@ public class FragmentOne extends Fragment implements  LocationSource, AMapLocati
     public void onLocationChanged(AMapLocation aMapLocation) {
         if (aMapLocation != null) {
             if (aMapLocation.getErrorCode() == 0) {
-                //可在其中解析amapLocation获取相应内容。
+                //可在其中解析amapLocation获取相应内容
                 aMapLocation.getLocationType();//获取当前定位结果来源，如网络定位结果，详见定位类型表
                 lat = aMapLocation.getLatitude();//获取纬度
                 lon = aMapLocation.getLongitude();//获取经度
@@ -226,6 +280,8 @@ public class FragmentOne extends Fragment implements  LocationSource, AMapLocati
                 aMapLocation.getCityCode();//城市编码
                 aMapLocation.getAdCode();//地区编码
                 aMapLocation.getAoiName();//获取当前定位点的AOI信息
+                lat = 45.75000;
+                lon = 126.63333;
                 myLatLng = new LatLng(lat, lon);
 
                 //获取定位时间
@@ -269,17 +325,11 @@ public class FragmentOne extends Fragment implements  LocationSource, AMapLocati
     @Override
     public void deactivate() {
         mListener = null;
-        if(mLocationClient!=null){
+        if (mLocationClient != null) {
             mLocationClient.stopLocation();
             mLocationClient.onDestroy();
         }
-        mLocationClient=null;
-    }
-
-    private void startLocation() {
-        if (mLocationClient != null) {
-            aMap.moveCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(lat, lon), zoomlevel));//17f代表地图放大的级别
-        }
+        mLocationClient = null;
     }
 
 
@@ -295,7 +345,8 @@ public class FragmentOne extends Fragment implements  LocationSource, AMapLocati
 
     @Override
     public void onPoiSearched(PoiResult poiResult, int i) {
-        ArrayList<PoiItem> pois = poiResult.getPois();
+        markers.clear();
+        pois = poiResult.getPois();
         for (PoiItem poi : pois) {
             //获取经纬度对象
             LatLonPoint llp = poi.getLatLonPoint();
@@ -305,12 +356,7 @@ public class FragmentOne extends Fragment implements  LocationSource, AMapLocati
             String title = poi.getTitle();
             //获取内容
             String snippet = poi.getSnippet();
-            //System.out.println(lon + "~~~" + lat + "~~~" + title + "~~~" + snippet);
-
-            //TcpManager socketThread = new TcpManager(snippet);
-            //socketThread.start();
-            //String str = socketThread.getData();
-            //System.out.print("socket has connect " + str );
+            //cardItem.add(new CardBean(0, title));
 
             LatLng latLng = new LatLng(latOfPoi, lonOfPoi);
             MarkerOptions markerOptions = new MarkerOptions().anchor(0.5f, 0.5f)
@@ -318,13 +364,20 @@ public class FragmentOne extends Fragment implements  LocationSource, AMapLocati
                     .title(title)
                     .snippet(snippet)
                     .icon(BitmapDescriptorFactory.fromResource(R.drawable.marker_normal));
-            aMap.addMarker(markerOptions);
+
+            Marker marker = aMap.addMarker(markerOptions);
+
+            markers.add(marker);
+
             aMap.setOnMarkerClickListener(this);
             aMap.setInfoWindowAdapter(this);//AMap类中
             aMap.setOnInfoWindowClickListener(this);
         }
-
-        //System.out.println("直接打印这个信息，代表没有搜索到信息");
+        if(!isData){
+            getOptionData();
+            initCustomOptionPicker();
+            isData = true;
+        }
     }
 
     @Override
@@ -403,7 +456,7 @@ public class FragmentOne extends Fragment implements  LocationSource, AMapLocati
         switch (id) {
             case R.id.navigation_LL:  //点击导航
                 LatLng latLng = oldMarker.getPosition();
-                RouteSearch.FromAndTo fromAndTo = new RouteSearch.FromAndTo(new LatLonPoint( lat, lon),
+                RouteSearch.FromAndTo fromAndTo = new RouteSearch.FromAndTo(new LatLonPoint(lat, lon),
                         new LatLonPoint(latLng.latitude, latLng.longitude));
                 RouteSearch.WalkRouteQuery query = new RouteSearch.WalkRouteQuery(fromAndTo, 3);//1代表步行，0是驾车，2是骑行
                 mRouteSearch.calculateWalkRouteAsyn(query);//开始算路
@@ -427,19 +480,6 @@ public class FragmentOne extends Fragment implements  LocationSource, AMapLocati
 
     }
 
-
-    /**
-     * 显示进度框
-     */
-    private void showProgressDialog() {
-        if (progDialog == null)
-            progDialog = new ProgressDialog(getContext());
-        progDialog.setProgressStyle(ProgressDialog.STYLE_SPINNER);
-        progDialog.setIndeterminate(false);
-        progDialog.setCancelable(true);
-        progDialog.setMessage("正在搜索");
-        progDialog.show();
-    }
 
     /**
      * 隐藏进度框
@@ -477,6 +517,56 @@ public class FragmentOne extends Fragment implements  LocationSource, AMapLocati
             }
         } else {
             ToastUtil.showerror(getContext(), i);
+        }
+    }
+
+    private void initCustomOptionPicker() {//条件选择器初始化，自定义布局
+        pvCustomOptions = new OptionsPickerBuilder(getContext(), new OnOptionsSelectListener() {
+            @Override
+            public void onOptionsSelect(int options1, int option2, int options3, View v) {
+                //返回的分别是三个级别的选中位置
+                int i = options1;
+                String tx = cardItem.get(i).getPickerViewText();
+                Oldoptions1 = i;
+                but_go.setText(tx);
+
+            }
+        }).setLayoutRes(R.layout.pickerview_custom_options, new CustomListener() {
+            @Override
+            public void customLayout(View v) {
+                final TextView tvSubmit = (TextView) v.findViewById(R.id.tv_finish);
+                ImageView ivCancel = (ImageView) v.findViewById(R.id.iv_cancel);
+                tvSubmit.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        pvCustomOptions.returnData();
+                        //Toast.makeText(getContext(), Oldoptions1, Toast.LENGTH_SHORT).show();
+                        onMapClick(new LatLng(markers.get(Oldoptions1).getPosition().latitude,markers.get(Oldoptions1).getPosition().longitude));
+                        onMarkerClick(markers.get(Oldoptions1));
+                        pvCustomOptions.dismiss();
+                    }
+                });
+
+                ivCancel.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        //Toast.makeText(getContext(), "hello", Toast.LENGTH_SHORT).show();
+                        pvCustomOptions.dismiss();
+                    }
+                });
+            }
+        })
+                .isDialog(true)
+                .build();
+        pvCustomOptions.setPicker(cardItem);//添加数据
+    }
+
+    private void getOptionData() {
+        //for (int i = 0; i < 5; i++) {
+          //  cardItem.add(new CardBean(i, "No.A " + i));
+        //}
+        for (int i = 0; i < pois.size(); i++) {
+            cardItem.add(new CardBean(i, pois.get(i).getTitle()));
         }
     }
 }

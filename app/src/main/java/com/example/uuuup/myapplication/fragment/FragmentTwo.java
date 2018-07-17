@@ -18,14 +18,20 @@ import android.view.ViewGroup;
 
 import java.util.ArrayList;
 
+import scut.carson_ho.searchview.ICallBack;
+import scut.carson_ho.searchview.SearchView;
+import scut.carson_ho.searchview.bCallBack;
+
+
 public class FragmentTwo extends Fragment {
 
     private RecyclerView contactList;
-    private String[] contactNames;
     private ArrayList<String> car_list = new ArrayList<>();
     private LinearLayoutManager layoutManager;
     private ContactAdapter adapter;
+    private SearchView searchView;
     private boolean flag = false;
+    private String[] contactNames;
 
     public static FragmentTwo newInstance(){
         FragmentTwo fragment = new FragmentTwo();
@@ -65,6 +71,24 @@ public class FragmentTwo extends Fragment {
         contactList.addItemDecoration(new DividerItemDecoration(getContext(), DividerItemDecoration.VERTICAL_LIST));
         contactList.setAdapter(adapter);
 
+        searchView = (SearchView) getView().findViewById(R.id.searchview);
+
+        // 4. 设置点击搜索按键后的操作（通过回调接口）
+        // 参数 = 搜索框输入的内容
+        searchView.setOnClickSearch(new ICallBack() {
+            @Override
+            public void SearchAciton(String string) {
+                System.out.println("我收到了" + string);
+            }
+        });
+
+        // 5. 设置点击返回按键后的操作（通过回调接口）
+        searchView.setOnClickBack(new bCallBack() {
+            @Override
+            public void BackAciton() {
+            }
+        });
+
         adapter.setOnItemClickListener(new ContactAdapter.OnItemClickListener() {//点击监听
             @Override
             public void onItemClick(View v, int position) {
@@ -97,5 +121,4 @@ public class FragmentTwo extends Fragment {
             }
         });
     }
-
 }

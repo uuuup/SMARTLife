@@ -1,8 +1,30 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:orientation="vertical" android:layout_width="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:orientation="vertical"
+    android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:weightSum="1">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="50dp"
+        android:background="@color/colorPrimaryDark"
+        android:gravity="center"
+        android:orientation="horizontal">
+
+        <scut.carson_ho.searchview.SearchView
+            android:id="@+id/searchview"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            app:textSizeSearch="5dp"
+            app:textColorSearch="#3F51B5"
+            app:textHintSearch="输入查询关键字"
+            app:searchBlockHeight="150"
+            app:searchBlockColor="#ffffff" />
+    </LinearLayout>
+
+
 
     <com.amap.api.maps2d.MapView
         android:id="@+id/fragment_one_map"
@@ -10,6 +32,17 @@
         android:layout_height="match_parent"
         android:layout_alignParentBottom="true"
         android:layout_alignParentRight="true"
-        android:layout_alignParentEnd="true" />
+        android:layout_alignParentEnd="true" >
+        <Button
+            android:id="@+id/btn_CustomOptions"
+            android:layout_width="match_parent"
+            android:layout_height="50dp"
+            android:layout_margin="10dp"
+            android:text="test" />
+
+    </com.amap.api.maps2d.MapView>
+
+
+
 
 </LinearLayout>

@@ -7,6 +7,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
 import android.widget.FrameLayout;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 
 
@@ -37,6 +38,10 @@ public class ChatAdapter extends RecyclerView.Adapter<ChatAdapter.ViewHolder> {
     }
 
     static class ViewHolder extends RecyclerView.ViewHolder {
+        @Bind(R.id.idLeft)
+        TextView idLeft;
+        @Bind(R.id.idRight)
+        TextView idRight;
         @Bind(R.id.tvTime)
         TextView tvTime;
         @Bind(R.id.tvLeft)
@@ -58,7 +63,7 @@ public class ChatAdapter extends RecyclerView.Adapter<ChatAdapter.ViewHolder> {
 
     @Override
     public ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-        View convertView  = mInflater.inflate(R.layout.lv_item_chat, parent, false);
+        View convertView  = mInflater.inflate(R.layout.new_lv_item_chat, parent, false);
         return new ViewHolder(convertView);
     }
 
@@ -71,21 +76,31 @@ public class ChatAdapter extends RecyclerView.Adapter<ChatAdapter.ViewHolder> {
         } else {
             holder.tvTime.setVisibility(View.GONE);
         }
+
+        holder.idLeft.setVisibility(View.GONE);
         holder.frameLeft.setVisibility(View.GONE);
+
+        holder.idRight.setVisibility(View.GONE);
         holder.frameRight.setVisibility(View.GONE);
+
         if (bean.content.equals("exit")) {
             holder.tvTip.setVisibility(View.VISIBLE);
-            holder.tvTip.setText(bean.name.equals(userId) ? "您已退出讨论组" : bean.name + "已退出讨论组");
+            holder.tvTip.setText(bean.name.equals(userId) ? "您已退出讨论组" : 's'+ bean.name + "已退出讨论组");
         } else if (bean.content.equals("join")) {
             holder.tvTip.setVisibility(View.VISIBLE);
-            holder.tvTip.setText(bean.name.equals(userId) ? "您已加入讨论组" : bean.name + "加入讨论组");
+            holder.tvTip.setText(bean.name.equals(userId) ? "您已加入讨论组" : 's'+ bean.name + "加入讨论组");
         } else {
             holder.tvTip.setVisibility(View.GONE);
+            holder.idLeft.setVisibility(bean.name.equals(userId) ? View.GONE : View.VISIBLE);
             holder.frameLeft.setVisibility(bean.name.equals(userId) ? View.GONE : View.VISIBLE);
+
+            holder.idRight.setVisibility(bean.name.equals(userId) ? View.VISIBLE : View.GONE);
             holder.frameRight.setVisibility(bean.name.equals(userId) ? View.VISIBLE : View.GONE);
             if (bean.name.equals(userId)) {
+                holder.idRight.setText('s' + bean.name);
                 holder.tvRight.setText(bean.content);
             } else {
+                holder.idLeft.setText('s' + bean.name);
                 holder.tvLeft.setText(bean.content);
             }
         }

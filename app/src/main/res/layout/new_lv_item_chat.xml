@@ -26,18 +26,24 @@
             android:visibility="gone" />
     </LinearLayout>
 
+    <TextView
+        android:visibility="gone"
+        android:id="@+id/idLeft"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true"
+        android:layout_below="@+id/linTop"/>
 
     <FrameLayout
         android:id="@+id/frameLeft"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_gravity="center"
         android:layout_alignParentLeft="true"
         android:layout_alignParentStart="true"
-        android:layout_below="@+id/linTop"
-        android:layout_gravity="center"
-
-        android:background="@drawable/message_left"
-        android:visibility="gone">
+        android:layout_below="@+id/idLeft"
+        android:background="@drawable/message_left">
 
         <TextView
             android:id="@+id/tvLeft"
@@ -47,18 +53,24 @@
             android:layout_margin="10dp" />
     </FrameLayout>
 
+    <TextView
+        android:visibility="gone"
+        android:id="@+id/idRight"
+        android:layout_alignParentEnd="true"
+        android:layout_alignParentRight="true"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/linTop"/>
 
     <FrameLayout
+        android:layout_alignParentEnd="true"
+        android:layout_alignParentRight="true"
+        android:visibility="gone"
         android:id="@+id/frameRight"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_alignParentEnd="true"
-        android:layout_alignParentRight="true"
-        android:layout_below="@+id/linTop"
-
         android:background="@drawable/message_right"
-        android:visibility="gone">
-
+        android:layout_below="@+id/idRight">
         <TextView
             android:id="@+id/tvRight"
             android:layout_width="wrap_content"
@@ -66,4 +78,5 @@
             android:layout_gravity="center"
             android:layout_margin="10dp" />
     </FrameLayout>
+
 </RelativeLayout>

@@ -48,7 +48,6 @@ public class FragmentThree extends Fragment {
     }
 
     public void initview() {
-        //getActivity().requestWindowFeature(Window.FEATURE_NO_TITLE);//去掉标题栏
         blurImageView = (ImageView) getView().findViewById(R.id.iv_blur);
         avatarImageView = (ImageView) getView().findViewById(R.id.iv_avatar);
 
