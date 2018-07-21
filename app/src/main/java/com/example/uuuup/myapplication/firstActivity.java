@@ -3,9 +3,6 @@ package com.example.uuuup.myapplication;
 
 import android.os.Bundle;
 import android.support.v4.app.FragmentTransaction;
-import android.view.View;
-import android.widget.Button;
-import android.widget.TextView;
 
 import com.ashokvarma.bottomnavigation.BadgeItem;
 import com.ashokvarma.bottomnavigation.BottomNavigationBar;
@@ -27,13 +24,12 @@ public class firstActivity extends TitleActivity implements BottomNavigationBar.
         setContentView(R.layout.activity_first);
 
         android.support.v7.app.ActionBar actionBar= getSupportActionBar();
-        if(actionBar!=null)
-        {
+        if(actionBar!=null) {
             actionBar.hide();
         }
 
         setTitle("智慧公交");
-        showBackwardView(R.string.text_back,true);
+        //showBackwardView(,true);
         showForwardView(R.string.text_forward,false);
 
 

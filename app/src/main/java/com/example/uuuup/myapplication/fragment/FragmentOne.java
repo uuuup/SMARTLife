@@ -2,7 +2,9 @@ package com.example.uuuup.myapplication.fragment;
 
 import android.app.ProgressDialog;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.support.v4.app.Fragment;
 import android.util.Log;
 
@@ -29,6 +31,7 @@ import com.amap.api.maps2d.LocationSource;
 import com.amap.api.maps2d.MapView;
 import com.amap.api.maps2d.UiSettings;
 import com.amap.api.maps2d.model.BitmapDescriptorFactory;
+import com.amap.api.maps2d.model.CameraPosition;
 import com.amap.api.maps2d.model.LatLng;
 import com.amap.api.maps2d.model.Marker;
 import com.amap.api.maps2d.model.MarkerOptions;
@@ -87,7 +90,6 @@ public class FragmentOne extends Fragment implements  LocationSource, AMapLocati
     private RouteSearch mRouteSearch;
     private WalkRouteResult mWalkRouteResult;
     private RelativeLayout mBottomLayout, mHeadLayout;
-    private TextView mRotueTimeDes, mRouteDetailDes;
     private ProgressDialog progDialog = null;// 搜索时进度条
 
     private Button but_go;
@@ -99,6 +101,9 @@ public class FragmentOne extends Fragment implements  LocationSource, AMapLocati
     private ArrayList<Marker> markers = new ArrayList<>();
     private int Oldoptions1;
     private boolean isData = false;
+
+    private SharedPreferences pref;//本地存储数据
+    private SharedPreferences.Editor editor;
 
 
     public static FragmentOne newInstance() {
@@ -128,15 +133,12 @@ public class FragmentOne extends Fragment implements  LocationSource, AMapLocati
     public void onActivityCreated(Bundle savedInstanceState) {
         // TODO Auto-generated method stub
         super.onActivityCreated(savedInstanceState);
+        pref = PreferenceManager.getDefaultSharedPreferences(getContext());
 
-        searchView = (SearchView) getView().findViewById(R.id.searchview);
-
-        // 4. 设置点击搜索按键后的操作（通过回调接口）
-        // 参数 = 搜索框输入的内容
+        searchView = (SearchView) getView().findViewById(R.id.searchview);// 4. 设置点击搜索按键后的操作（通过回调接口）
         searchView.setOnClickSearch(new ICallBack() {
             @Override
             public void SearchAciton(String string) {
-                System.out.println("我收到了" + string);
                 Intent intent = new Intent(getActivity(), TextBusActivity.class);
                 intent.putExtra("bus", string);
                 startActivity(intent);
@@ -152,8 +154,6 @@ public class FragmentOne extends Fragment implements  LocationSource, AMapLocati
     }
 
     public void initview(Bundle savedInstanceState, View view) {
-
-
         mMapView = (MapView) view.findViewById(R.id.fragment_one_map);
         mMapView.onCreate(savedInstanceState);
         if (aMap == null) {
@@ -161,6 +161,20 @@ public class FragmentOne extends Fragment implements  LocationSource, AMapLocati
             aMap.setLocationSource(this);//设置了定位的监听,这里要实现LocationSource接口
             aMap.setMyLocationEnabled(true);//显示定位层并且可以触发定位,默认是flase
 
+
+            aMap.moveCamera(CameraUpdateFactory.zoomTo(zoomlevel));
+            aMap.setOnCameraChangeListener(new AMap.OnCameraChangeListener() {
+                @Override
+                public void onCameraChange(CameraPosition cameraPosition) {
+                }
+                @Override
+                public void onCameraChangeFinish(CameraPosition cameraPosition) {
+                    if (zoomlevel != cameraPosition.zoom ){
+                        zoomlevel = cameraPosition.zoom;
+                        //Toast.makeText(getContext(),"缩放了，不作为",Toast.LENGTH_SHORT).show();
+                    }
+                }
+            });
             UiSettings settings = aMap.getUiSettings();//设置显示定位按钮 并且可以点击
             settings.setMyLocationButtonEnabled(false);// 是否显示定位按钮
 
@@ -176,7 +190,6 @@ public class FragmentOne extends Fragment implements  LocationSource, AMapLocati
         mRouteSearch.setRouteSearchListener(this);
         //开始定位
         location();
-
 
         but_go = (Button) view.findViewById(R.id.btn_CustomOptions);
         but_go.setOnClickListener(new View.OnClickListener() {
@@ -283,6 +296,9 @@ public class FragmentOne extends Fragment implements  LocationSource, AMapLocati
                 lat = 45.75000;
                 lon = 126.63333;
                 myLatLng = new LatLng(lat, lon);
+                editor = pref.edit();
+                editor.putString("city", aMapLocation.getCity());//如果复选框被选中则进行提交
+
 
                 //获取定位时间
                 SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
@@ -541,7 +557,8 @@ public class FragmentOne extends Fragment implements  LocationSource, AMapLocati
                     public void onClick(View v) {
                         pvCustomOptions.returnData();
                         //Toast.makeText(getContext(), Oldoptions1, Toast.LENGTH_SHORT).show();
-                        onMapClick(new LatLng(markers.get(Oldoptions1).getPosition().latitude,markers.get(Oldoptions1).getPosition().longitude));
+                        //onMapClick(new LatLng(markers.get(Oldoptions1).getPosition().latitude,markers.get(Oldoptions1).getPosition().longitude));
+                        aMap.moveCamera(CameraUpdateFactory.changeLatLng(new LatLng( markers.get(Oldoptions1).getPosition().latitude, markers.get(Oldoptions1).getPosition().longitude)));
                         onMarkerClick(markers.get(Oldoptions1));
                         pvCustomOptions.dismiss();
                     }
@@ -562,9 +579,6 @@ public class FragmentOne extends Fragment implements  LocationSource, AMapLocati
     }
 
     private void getOptionData() {
-        //for (int i = 0; i < 5; i++) {
-          //  cardItem.add(new CardBean(i, "No.A " + i));
-        //}
         for (int i = 0; i < pois.size(); i++) {
             cardItem.add(new CardBean(i, pois.get(i).getTitle()));
         }

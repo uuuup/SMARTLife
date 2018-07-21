@@ -1,21 +1,21 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-android:orientation="vertical"
-android:layout_width="match_parent"
-android:layout_height="match_parent"
-android:background="#d8e0e8" >
-
+    android:orientation="vertical"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#d8e0e8" >
+    <include layout="@layout/title_chatroom"></include>
     <android.support.v7.widget.RecyclerView
     android:id="@+id/listView"
     android:layout_width="match_parent"
     android:layout_height="0dp"
     android:layout_weight="1" />
 
-
     <LinearLayout
         android:background="#ffffff"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content" >
+        android:layout_height="wrap_content"
+        >
 
         <EditText
             android:id="@+id/etContent"
@@ -31,4 +31,5 @@ android:background="#d8e0e8" >
             android:layout_height="wrap_content"
             android:text="Send" />
     </LinearLayout>
+
 </LinearLayout>

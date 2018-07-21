@@ -6,6 +6,7 @@ import com.example.uuuup.myapplication.base.DividerItemDecoration;
 
 import com.example.uuuup.myapplication.chat.view.ChatRoomActivity;
 
+import android.app.ProgressDialog;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
@@ -15,6 +16,7 @@ import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Toast;
 
 import java.util.ArrayList;
 
@@ -32,6 +34,9 @@ public class FragmentTwo extends Fragment {
     private SearchView searchView;
     private boolean flag = false;
     private String[] contactNames;
+    private ArrayList<String> all_car ;
+
+    private ProgressDialog progDialog = null;// 进度框
 
     public static FragmentTwo newInstance(){
         FragmentTwo fragment = new FragmentTwo();
@@ -60,6 +65,18 @@ public class FragmentTwo extends Fragment {
     }
 
     private String[] getDefaultcar(){
+        all_car = new ArrayList<String>() {{
+            add("1路");
+            add("2路");
+            add("3路");
+            add("4路");
+            add("5路");
+            add("6路");
+            add("7路");
+            add("8路");
+            add("9路");
+            add("10路");
+        }};
         return new String[] { "1路", "2路", "3路", "4路", "5路"};
     }
 
@@ -78,7 +95,36 @@ public class FragmentTwo extends Fragment {
         searchView.setOnClickSearch(new ICallBack() {
             @Override
             public void SearchAciton(String string) {
-                System.out.println("我收到了" + string);
+                showProgressDialog();
+                try{
+                    if( Integer.parseInt(string) <= 10 && Integer.parseInt(string) >= 1 ){
+                        if (car_list.indexOf(string+"路") == -1 ){
+                            car_list.add(string+"路");
+                            adapter.notifyItemInserted(car_list.size());
+                        }
+                        dissmissProgressDialog();
+                        Intent intent = new Intent(getActivity(), ChatRoomActivity.class);
+                        intent.putExtra("busname",string+"路");
+                        startActivity(intent);
+                    }
+                } catch(Exception e){
+                    if( all_car.indexOf(string) != -1){// 这种的输入数据是XXXXX路
+                        if (car_list.indexOf(string) == -1 ){
+                            car_list.add(string);
+                            adapter.notifyItemInserted(car_list.size());
+                        }
+                        dissmissProgressDialog();
+                        Intent intent = new Intent(getActivity(), ChatRoomActivity.class);
+
+                        intent.putExtra("busname",string);
+                        startActivity(intent);
+                    } else{
+                        dissmissProgressDialog();
+                        Toast.makeText(getContext(), "该线路暂时未开通聊天室", Toast.LENGTH_SHORT).show();
+                    }
+                    e.printStackTrace();
+                }
+
             }
         });
 
@@ -93,6 +139,7 @@ public class FragmentTwo extends Fragment {
             @Override
             public void onItemClick(View v, int position) {
                 Intent intent = new Intent(getActivity(), ChatRoomActivity.class);
+                intent.putExtra("busname",car_list.get(position));
                 startActivity(intent);
                 //Toast.makeText(getActivity(),"the number"+position+"has been clicked",Toast.LENGTH_SHORT).show();
             }
@@ -120,5 +167,24 @@ public class FragmentTwo extends Fragment {
                 adapter.notifyItemRemoved(position);
             }
         });
+    }
+
+    private void showProgressDialog() {
+        if (progDialog == null)
+            progDialog = new ProgressDialog(getContext());
+        progDialog.setProgressStyle(ProgressDialog.STYLE_SPINNER);
+        progDialog.setIndeterminate(false);
+        progDialog.setCancelable(true);
+        progDialog.setMessage("正在搜索:\n");
+        progDialog.show();
+    }
+
+    /**
+     * 隐藏进度框
+     */
+    private void dissmissProgressDialog() {
+        if (progDialog != null) {
+            progDialog.dismiss();
+        }
     }
 }

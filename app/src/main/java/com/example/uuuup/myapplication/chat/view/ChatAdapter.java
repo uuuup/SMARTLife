@@ -30,11 +30,18 @@ public class ChatAdapter extends RecyclerView.Adapter<ChatAdapter.ViewHolder> {
     private LayoutInflater mInflater;
     private SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
     private String userId;
+    private String OldUserId;
 
-    public ChatAdapter(Context ctx, String userId,  List<ChatBean> List) {
+    public ChatAdapter(Context ctx, String userId, String OldUserId,  List<ChatBean> List) {
         mInflater = LayoutInflater.from(ctx);
         mList = List;
         this.userId = userId;
+        this.OldUserId = OldUserId;
+    }
+
+    public void setUserId(String str1, String str2){
+        userId = str1;
+        OldUserId = str2;
     }
 
     static class ViewHolder extends RecyclerView.ViewHolder {
@@ -96,7 +103,7 @@ public class ChatAdapter extends RecyclerView.Adapter<ChatAdapter.ViewHolder> {
 
             holder.idRight.setVisibility(bean.name.equals(userId) ? View.VISIBLE : View.GONE);
             holder.frameRight.setVisibility(bean.name.equals(userId) ? View.VISIBLE : View.GONE);
-            if (bean.name.equals(userId)) {
+            if (bean.name.equals(userId) || bean.name.equals(OldUserId)) {
                 holder.idRight.setText('s' + bean.name);
                 holder.tvRight.setText(bean.content);
             } else {

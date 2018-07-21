@@ -1,5 +1,6 @@
 package com.example.uuuup.myapplication.fragment;
 
+import android.app.ProgressDialog;
 import android.graphics.BitmapFactory;
 import android.graphics.Color;
 import android.support.v7.app.AppCompatActivity;
@@ -43,13 +44,15 @@ public class TextBusActivity extends AppCompatActivity implements BusLineSearch.
     private ArrayList<TimelineRow> timelineRowsList = new ArrayList<>();
     ArrayAdapter<TimelineRow> myAdapter;
 
+    private ProgressDialog progDialog = null;// 进度框
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_text_bus);
 
+        showProgressDialog();
         bus = getIntent().getStringExtra("bus");
-
         busLineQuery = new BusLineQuery(bus, BusLineQuery.SearchType.BY_LINE_NAME,
                 cityCode);// 第一个参数表示公交线路名，第二个参数表示公交线路查询，第三个参数表示所在城市名或者城市区号
         busLineQuery.setPageSize(10);// 设置每页返回多少条数据
@@ -64,7 +67,8 @@ public class TextBusActivity extends AppCompatActivity implements BusLineSearch.
      */
     @Override
     public void onBusLineSearched(BusLineResult result, int rCode) {
-        if (true){
+        dissmissProgressDialog();
+        if (rCode == 1000){
             if (result != null && result.getQuery() != null
                     && result.getQuery().equals(busLineQuery)) {
                 if (result.getQuery().getCategory() == SearchType.BY_LINE_NAME) {
@@ -148,7 +152,7 @@ public class TextBusActivity extends AppCompatActivity implements BusLineSearch.
         TimelineRow myRow = new TimelineRow(id);
         myRow.setTitle("线路 " + bus);
         myRow.setDescription("到站 " + station);
-        myRow.setImage(BitmapFactory.decodeResource(getResources(), R.drawable.bus));
+        myRow.setImage(BitmapFactory.decodeResource(getResources(), R.drawable.station));
         myRow.setBellowLineColor(getRandomColor());
         //to set row Below Line Size in dp (optional)
         myRow.setBellowLineSize(getRandomNumber(2, 2));
@@ -164,4 +168,24 @@ public class TextBusActivity extends AppCompatActivity implements BusLineSearch.
     public int getRandomNumber(int min, int max) {
         return min + (int) (Math.random() * max);
     }
+
+    private void showProgressDialog() {
+        if (progDialog == null)
+            progDialog = new ProgressDialog(this);
+        progDialog.setProgressStyle(ProgressDialog.STYLE_SPINNER);
+        progDialog.setIndeterminate(false);
+        progDialog.setCancelable(true);
+        progDialog.setMessage("正在搜索:\n");
+        progDialog.show();
+    }
+
+    /**
+     * 隐藏进度框
+     */
+    private void dissmissProgressDialog() {
+        if (progDialog != null) {
+            progDialog.dismiss();
+        }
+    }
+
 }

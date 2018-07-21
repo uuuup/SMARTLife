@@ -76,6 +76,11 @@
     <string name="text_back">返回</string>
     <string name="text_forward">提交</string>
 
+    <string name="str_recorder_normal">按住说话</string>
+    <string name="str_recorder_recording">松开结束</string>
+    <string name="str_recorder_want_cancel">松开手指，取消发送</string>
+
+
     <string name="show_notice">\t\t\t\t\t自V1.0.6版本开始，应用源码中将不再公开ApplicationId,开发者请自行到官网申请。\n\t\t\t\t\t申请成功之后在应用程序启动页(SplashActivity)进行初始化操作!</string>
     <string name="title_activity_default_bus_">default_bus_Activity</string>
 </resources>

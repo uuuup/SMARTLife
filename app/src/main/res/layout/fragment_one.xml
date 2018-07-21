@@ -29,20 +29,17 @@
     <com.amap.api.maps2d.MapView
         android:id="@+id/fragment_one_map"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
+        android:layout_height="412dp"
         android:layout_alignParentBottom="true"
         android:layout_alignParentRight="true"
         android:layout_alignParentEnd="true" >
-        <Button
-            android:id="@+id/btn_CustomOptions"
-            android:layout_width="match_parent"
-            android:layout_height="50dp"
-            android:layout_margin="10dp"
-            android:text="test" />
 
     </com.amap.api.maps2d.MapView>
 
-
-
-
+    <Button
+        android:id="@+id/btn_CustomOptions"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="@color/white"
+       android:text="BusStation" />
 </LinearLayout>
