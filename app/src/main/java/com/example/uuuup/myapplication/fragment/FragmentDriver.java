@@ -1,74 +1,33 @@
 package com.example.uuuup.myapplication.fragment;
 
-import android.app.ProgressDialog;
-import android.content.Intent;
-import android.content.SharedPreferences;
 import android.os.Bundle;
-import android.preference.PreferenceManager;
 import android.support.v4.app.Fragment;
 import android.util.Log;
 
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-
-import android.widget.Button;
-
-import android.widget.ImageView;
-import android.widget.LinearLayout;
-import android.widget.RelativeLayout;
-import android.widget.TextView;
 import android.widget.Toast;
 
 import com.amap.api.location.AMapLocation;
 import com.amap.api.location.AMapLocationClient;
 import com.amap.api.location.AMapLocationClientOption;
 import com.amap.api.location.AMapLocationListener;
-import com.amap.api.maps2d.AMap;
-import com.amap.api.maps2d.AMapOptions;
-import com.amap.api.maps2d.CameraUpdateFactory;
-import com.amap.api.maps2d.LocationSource;
-import com.amap.api.maps2d.MapView;
-import com.amap.api.maps2d.UiSettings;
-import com.amap.api.maps2d.model.BitmapDescriptorFactory;
-import com.amap.api.maps2d.model.CameraPosition;
-import com.amap.api.maps2d.model.LatLng;
-import com.amap.api.maps2d.model.Marker;
-import com.amap.api.maps2d.model.MarkerOptions;
-import com.amap.api.maps2d.model.TileOverlayOptions;
-import com.amap.api.maps2d.overlay.WalkRouteOverlay;
-import com.amap.api.services.core.LatLonPoint;
-import com.amap.api.services.core.PoiItem;
-import com.amap.api.services.poisearch.PoiResult;
-import com.amap.api.services.poisearch.PoiSearch;
-
-import com.amap.api.services.route.BusRouteResult;
-import com.amap.api.services.route.DriveRouteResult;
-import com.amap.api.services.route.RouteSearch;
-
-import com.amap.api.services.route.WalkPath;
-import com.amap.api.services.route.WalkRouteResult;
-import com.bigkoo.pickerview.builder.OptionsPickerBuilder;
-import com.bigkoo.pickerview.listener.CustomListener;
-import com.bigkoo.pickerview.view.OptionsPickerView;
-
-import com.example.uuuup.myapplication.MoreInformation;
+import com.amap.api.maps.AMap;
+import com.amap.api.maps.AMapOptions;
+import com.amap.api.maps.CameraUpdateFactory;
+import com.amap.api.maps.LocationSource;
+import com.amap.api.maps.MapView;
+import com.amap.api.maps.UiSettings;
+import com.amap.api.maps.model.HeatmapTileProvider;
+import com.amap.api.maps.model.LatLng;
+import com.amap.api.maps.model.TileOverlayOptions;
 import com.example.uuuup.myapplication.R;
-import com.example.uuuup.myapplication.ToastUtil;
-import com.example.uuuup.myapplication.bean.CardBean;
-
-import com.bigkoo.pickerview.listener.OnOptionsSelectListener;
-
-import scut.carson_ho.searchview.ICallBack;
-import scut.carson_ho.searchview.SearchView;
-import scut.carson_ho.searchview.bCallBack;
-
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
 
-public class FragmentDriver extends Fragment implements  LocationSource, AMapLocationListener{
+public class FragmentDriver extends Fragment implements LocationSource, AMapLocationListener{
     private View view;
     private MapView mMapView;//地图容器
     private boolean isFirstLoc = true;//标识，用于判断是否只显示一次定位信息和用户重新定位
@@ -114,7 +73,7 @@ public class FragmentDriver extends Fragment implements  LocationSource, AMapLoc
     }
 
     public void initview(Bundle savedInstanceState, View view) {
-        mMapView = (MapView) view.findViewById(R.id.fragment_one_map);
+        mMapView = (MapView) view.findViewById(R.id.fragment_driver_map);
         mMapView.onCreate(savedInstanceState);
         if (aMap == null) {
             aMap = mMapView.getMap();
@@ -131,6 +90,8 @@ public class FragmentDriver extends Fragment implements  LocationSource, AMapLoc
             aMap.getCameraPosition(); //方法可以获取地图的旋转角度
             settings.setCompassEnabled(true);
         }
+
+        initdraw();
         //开始定位
         location();
     }
@@ -289,5 +250,18 @@ public class FragmentDriver extends Fragment implements  LocationSource, AMapLoc
             latlngs[i] = new LatLng(x + x_, y + y_);
         }
 
+        // 构建热力图 HeatmapTileProvider
+        HeatmapTileProvider.Builder builder = new HeatmapTileProvider.Builder();
+        builder.data(Arrays.asList(latlngs)) ;// 设置热力图绘制的数据
+        // 设置热力图渐变，有默认值 DEFAULT_GRADIENT，可不设置该接口
+        // Gradient 的设置可见参考手册
+        // 构造热力图对象
+        HeatmapTileProvider heatmapTileProvider = builder.build();
+
+        // 初始化 TileOverlayOptions
+        TileOverlayOptions tileOverlayOptions = new TileOverlayOptions();
+        tileOverlayOptions.tileProvider(heatmapTileProvider); // 设置瓦片图层的提供者
+        // 向地图上添加 TileOverlayOptions 类对象
+        aMap.addTileOverlay(tileOverlayOptions);
     }
 }

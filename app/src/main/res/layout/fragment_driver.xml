@@ -5,12 +5,12 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:weightSum="1">
-    <com.amap.api.maps2d.MapView
-        android:id="@+id/fragment_one_map"
+    <com.amap.api.maps.MapView
+        android:id="@+id/fragment_driver_map"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:layout_alignParentBottom="true"
         android:layout_alignParentRight="true"
         android:layout_alignParentEnd="true" >
-    </com.amap.api.maps2d.MapView>
+    </com.amap.api.maps.MapView>
 </LinearLayout>
