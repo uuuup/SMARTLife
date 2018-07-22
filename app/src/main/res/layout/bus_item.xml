@@ -3,6 +3,7 @@
     android:orientation="vertical"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
+    xmlns:lh2="http://schemas.android.com/apk/res-auto"
     android:padding="10dp" >
 
     <LinearLayout
@@ -14,14 +15,21 @@
             android:id="@+id/bus_name"
             android:layout_width="300dp"
             android:layout_height="wrap_content"
-            android:textSize="18sp"
+            android:textSize="10sp"
             />
 
-        <CheckBox
-            android:id="@+id/checkbox_bus"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content" />
-
+        <com.example.uuuup.myapplication.utils.DrawableSwitch
+            android:id="@+id/item_bus_drawableSwitch"
+            android:layout_width="100dp"
+            android:layout_height="60dp"
+            android:layout_marginLeft="10dp"
+            android:layout_marginTop="10dp"
+            lh2:circleColor="#F9F9F9"
+            lh2:isSwitchOn="false"
+            lh2:radius="20dp"
+            lh2:switchOffColor="#D8D8D8"
+            lh2:switchOnColor="#6AB344"
+            lh2:textColor="#1C1C0F" />
 
     </LinearLayout>
 

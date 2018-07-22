@@ -18,26 +18,27 @@ import com.example.uuuup.myapplication.MainActivity;
 import com.example.uuuup.myapplication.R;
 import com.example.uuuup.myapplication.default_bus_Activity;
 import com.example.uuuup.myapplication.entity.item_view;
+import com.example.uuuup.myapplication.firstActivity;
 import com.example.uuuup.myapplication.utils.DefaultSettingActivity;
 
 import jp.wasabeef.glide.transformations.BlurTransformation;
 import jp.wasabeef.glide.transformations.CropCircleTransformation;
 
-public class FragmentThree extends Fragment {
+public class Fragmentfour extends Fragment {
 
 
     private ImageView blurImageView;
     private ImageView avatarImageView;
 
-    public static FragmentThree newInstance(){
-        FragmentThree fragment = new FragmentThree();
+    public static Fragmentfour newInstance(){
+        Fragmentfour fragment = new Fragmentfour();
         return fragment;
     }
 
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        View view = inflater.inflate(R.layout.fragment_three,container,false);
+        View view = inflater.inflate(R.layout.fragmentfour,container,false);
         return view;
     }
 
@@ -59,7 +60,7 @@ public class FragmentThree extends Fragment {
         Glide.with(getActivity()).load(R.drawable.zhihu)
                 .bitmapTransform(new CropCircleTransformation(getActivity()))
                 .into(avatarImageView);
-        final item_view default_bus = (item_view) getView().findViewById(R.id.default_bus);
+        final item_view default_bus = (item_view) getView().findViewById(R.id.fragmentfour_default_bus);
         default_bus.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -68,11 +69,11 @@ public class FragmentThree extends Fragment {
             }
         });
 
-        final item_view sign_in = (item_view) getView().findViewById(R.id.fragment_three_signin);
+        final item_view sign_in = (item_view) getView().findViewById(R.id.fragmentfour_signin);
         sign_in.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent intent = new Intent(getActivity(), LoginActivity.class);
+                Intent intent = new Intent(getActivity(), firstActivity.class);
                 startActivity(intent);
             }
         });

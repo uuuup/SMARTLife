@@ -47,16 +47,16 @@
     </RelativeLayout>
 
     <com.example.uuuup.myapplication.entity.item_view
-        android:id="@+id/fragment_three_signin"
+        android:id="@+id/fragmentfour_signin"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:background="@color/white"
         zsg:show_bottomline="true"
         zsg:show_leftimg="@drawable/shoucang"
-        zsg:show_text="登录" />
+        zsg:show_text="注销" />
 
     <com.example.uuuup.myapplication.entity.item_view
-        android:id="@+id/fragment_three_signup"
+        android:id="@+id/fragmentfour_signup"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:background="@color/white"
@@ -68,7 +68,7 @@
     <com.example.uuuup.myapplication.entity.item_view
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:id="@+id/default_bus"
+        android:id="@+id/fragmentfour_default_bus"
         android:layout_marginTop="10dp"
         android:background="@color/white"
         zsg:show_bottomline="true"

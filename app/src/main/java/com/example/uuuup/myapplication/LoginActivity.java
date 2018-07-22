@@ -27,13 +27,13 @@ public class LoginActivity extends BaseActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_login);
+        setContentView(R.layout.login);
 
         pref = PreferenceManager.getDefaultSharedPreferences(this);
-        accountEdit = (EditText) findViewById(R.id.account);
-        passwordEdit = (EditText) findViewById(R.id.password);
-        rememberPass = (CheckBox) findViewById(R.id.remember_pass);
-        login = (Button) findViewById(R.id.login);
+        accountEdit = (EditText) findViewById(R.id.accountEt);
+        passwordEdit = (EditText) findViewById(R.id.passwordEt);
+        rememberPass = (CheckBox) findViewById(R.id.login_remember_pass);
+        login = (Button) findViewById(R.id.loginBtn);
 
         boolean isRemember = pref.getBoolean("remember_pass", false);
         if(isRemember){
@@ -62,7 +62,7 @@ public class LoginActivity extends BaseActivity {
                         editor.clear();
                     }
                     editor.apply();
-                    Intent intent = new Intent(LoginActivity.this, firstActivity.class);
+                    Intent intent = new Intent(LoginActivity.this, LoginSuccessActivity.class);
                     startActivity(intent);
                     finish();
                 } else {

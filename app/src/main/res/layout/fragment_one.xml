@@ -33,7 +33,6 @@
         android:layout_alignParentBottom="true"
         android:layout_alignParentRight="true"
         android:layout_alignParentEnd="true" >
-
     </com.amap.api.maps2d.MapView>
 
     <Button
